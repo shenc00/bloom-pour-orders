@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bloom Pour – Pour Over Orders</title>
+<style>
+:root{--bg:#ececec;--accent:#e8620a;--text:#b84a00;--card:#f6f6f6;--line:#e8620a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;line-height:1.45}
+main{max-width:640px;margin:0 auto;padding:32px 16px 64px}
+h1{margin:0;text-align:center;font-size:clamp(40px,12vw,64px);color:var(--accent);letter-spacing:1px;line-height:1.05}
+.sub{text-align:center;font-size:20px;margin:6px 0 18px;text-transform:uppercase}
+hr{border:0;border-top:3px solid var(--line);margin:18px 0}
+.info{text-align:center;font-size:16px;margin:0 0 6px}
+.info b{color:var(--accent)}
+.card{background:var(--card);border:3px solid var(--line);border-radius:26px;padding:20px 22px;margin:16px 0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.name{font-size:22px;font-weight:bold}.price{font-size:26px;font-weight:bold;color:var(--accent)}
+.lbl{font-size:13px;color:var(--accent);text-transform:uppercase;margin-top:8px}
+.val{font-size:16px}
+.stepper{display:flex;align-items:center;gap:12px}
+.stepper button{width:40px;height:40px;border-radius:50%;border:2px solid var(--accent);background:transparent;color:var(--accent);font-size:22px;cursor:pointer}
+.stepper button:disabled{opacity:.35;cursor:default}
+.qty{min-width:24px;text-align:center;font-size:22px;font-weight:bold}
+.left{font-size:13px}.soldout{color:#777;font-weight:bold}
+h2{font-size:18px;margin:26px 0 8px;text-transform:uppercase;color:var(--accent)}
+label{display:block;font-size:14px;margin:12px 0 4px}
+input[type=text],input[type=tel],select,textarea{width:100%;padding:12px;font-size:16px;border:2px solid var(--line);border-radius:12px;background:#fff;color:#7a3000;font-family:inherit}
+.opt{display:flex;gap:10px;align-items:flex-start;margin:8px 0;font-size:16px}
+.opt input{margin-top:4px;accent-color:var(--accent)}
+.hint{font-size:13px;margin-top:4px}
+.total{display:flex;justify-content:space-between;font-size:22px;font-weight:bold;margin:22px 0 10px}
+.btn{width:100%;padding:16px;font-size:18px;font-weight:bold;border:0;border-radius:14px;background:var(--accent);color:#fff;cursor:pointer}
+.btn:disabled{opacity:.5}
+.err{background:#fff;border:2px solid #c0392b;color:#c0392b;border-radius:12px;padding:10px 12px;margin-top:12px;display:none}
+.hp{position:absolute;left:-9999px}
+.done{text-align:center}
+.done img{width:240px;max-width:80%;border-radius:12px;background:#fff;padding:8px}
+.foot{text-align:center;margin-top:28px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<main>
+  <h1>BLOOM POUR</h1>
+  <div class="sub">Pour over menu</div>
+  <hr>
+  <div id="info" class="info"></div>
+  <div id="app"><p class="info">Loading menu…</p></div>
+  <hr>
+  <div class="foot">Brewed fresh, cup by cup.</div>
+</main>
+<script>
+const $ = (s) => document.querySelector(s);
+const el = (t, props = {}, ...kids) => { const e = Object.assign(document.createElement(t), props); kids.flat().forEach(k => e.append(k)); return e; };
+let M, remaining, qty = {};
+
+async function load() {
+  const r = await fetch('/api/menu'); const d = await r.json();
+  M = d.menu; remaining = d.remaining; M.items.forEach(i => qty[i.id] ??= 0);
+  render();
+}
+
+function cups() { return M.items.reduce((s, i) => s + qty[i.id], 0); }
+function total() { return M.items.reduce((s, i) => s + qty[i.id] * i.price, 0); }
+
+function render() {
+  const info = $('#info'); info.replaceChildren(
+    el('div', {}, el('b', {textContent: `${M.eventDate} · ${M.hours}`})),
+    el('div', {textContent: M.notes.join(' · ')}),
+    el('div', {textContent: `Free delivery within ${M.estate} for ${M.freeDeliveryMinCups} cups or more. Fewer than ${M.freeDeliveryMinCups}: self-collection at ${M.collectionPoint}.`}),
+    el('div', {textContent: `Enquiries: ${M.contactName}, ${M.contactPhone}`}));
+
+  const soldOut = M.items.every(i => remaining[i.id] === 0);
+  const app = $('#app');
+  if (soldOut) { app.replaceChildren(el('div', {className: 'card done'}, el('h2', {textContent: 'All sold out'}), 'Thank you for your support!')); return; }
+
+  const form = el('form', {id: 'f', noValidate: true});
+  M.items.forEach(i => {
+    const left = remaining[i.id];
+    const stepper = el('div', {className: 'stepper'});
+    const minus = el('button', {type: 'button', textContent: '–', ariaLabel: `Less ${i.name}`, disabled: qty[i.id] === 0});
+    const plus = el('button', {type: 'button', textContent: '+', ariaLabel: `More ${i.name}`, disabled: qty[i.id] >= left});
+    minus.onclick = () => { qty[i.id]--; render(); keep(); };
+    plus.onclick = () => { qty[i.id]++; render(); keep(); };
+    stepper.append(minus, el('span', {className: 'qty', textContent: qty[i.id]}), plus);
+    form.append(el('div', {className: 'card'},
+      el('div', {className: 'row'}, el('span', {className: 'name', textContent: i.name}), el('span', {className: 'price', textContent: `$${i.price}`})),
+      el('div', {className: 'lbl', textContent: 'Process'}), el('div', {className: 'val', textContent: i.process}),
+      el('div', {className: 'lbl', textContent: 'Taste profile'}), el('div', {className: 'val', textContent: i.taste}),
+      el('div', {className: 'row', style: 'margin-top:14px'},
+        el('span', left ? {className: 'left', textContent: `${left} cup${left > 1 ? 's' : ''} left`} : {className: 'soldout', textContent: 'SOLD OUT'}),
+        left ? stepper : '')));
+  });
+
+  const delivery = cups() >= M.freeDeliveryMinCups;
+  form.append(
+    el('h2', {textContent: 'Your details'}),
+    field('Name', 'text', 'name', 'name'), field('Contact number', 'tel', 'phone', 'tel'),
+    el('h2', {textContent: 'Collection or delivery'}),
+    radio('collection', `Self-collection at ${M.collectionPoint}`, true),
+    radio('delivery', `Free delivery within ${M.estate} (${M.freeDeliveryMinCups} cups or more)`, false, !delivery),
+    el('div', {id: 'addrWrap', className: 'hidden'}, field('Block and unit number', 'text', 'address', 'street-address')),
+    el('label', {textContent: 'Preferred pick-up / delivery time'}),
+    (() => { const s = el('select', {id: 'slot', required: true}); s.append(el('option', {value: '', textContent: 'Choose a time window'})); M.slots.forEach(t => s.append(el('option', {value: t, textContent: t}))); return s; })(),
+    el('div', {className: 'hint', textContent: 'Pick-up: come by any time within your window. Delivery: arrives within your window.'}),
+    el('label', {textContent: 'Notes (optional)'}), el('textarea', {id: 'notes', rows: 2}),
+    el('input', {className: 'hp', id: 'website', tabIndex: -1, autocomplete: 'off', ariaHidden: 'true'}),
+    el('div', {className: 'total'}, el('span', {textContent: `Total (${cups()} cup${cups() === 1 ? '' : 's'})`}), el('span', {textContent: `$${total()}`})),
+    el('button', {className: 'btn', id: 'go', type: 'submit', textContent: 'Place order'}),
+    el('div', {className: 'hint', textContent: 'After ordering you will see a PayNow QR to pay. Please add your name as the reference.'}),
+    el('div', {className: 'err', id: 'err'}));
+  app.replaceChildren(form);
+  restore();
+  form.querySelectorAll('input[name=method]').forEach(r => r.onchange = toggleAddr);
+  toggleAddr();
+  form.onsubmit = submit;
+}
+
+function field(label, type, id, ac) {
+  return el('div', {}, el('label', {htmlFor: id, textContent: label}), el('input', {type, id, autocomplete: ac}));
+}
+function radio(value, text, checked, disabled = false) {
+  const i = el('input', {type: 'radio', name: 'method', value, checked, disabled});
+  return el('label', {className: 'opt', style: disabled ? 'opacity:.5' : ''}, i, el('span', {textContent: text}));
+}
+function toggleAddr() {
+  const d = document.querySelector('input[name=method]:checked')?.value === 'delivery';
+  $('#addrWrap').classList.toggle('hidden', !d);
+}
+
+// keep typed values when the steppers re-render the form
+let saved = {};
+function keep() {}
+function snapshot() { ['name', 'phone', 'address', 'slot', 'notes'].forEach(k => { const e = document.getElementById(k); if (e) saved[k] = e.value; }); saved.method = document.querySelector('input[name=method]:checked')?.value; }
+function restore() { ['name', 'phone', 'address', 'slot', 'notes'].forEach(k => { const e = document.getElementById(k); if (e && saved[k] != null) e.value = saved[k]; }); if (saved.method === 'delivery' && cups() >= M.freeDeliveryMinCups) document.querySelector('input[value=delivery]').checked = true; }
+const _render = render; render = function () { snapshot(); _render(); };
+
+async function submit(e) {
+  e.preventDefault();
+  const err = $('#err'); err.style.display = 'none';
+  const body = {
+    name: $('#name').value, phone: $('#phone').value, items: qty,
+    method: document.querySelector('input[name=method]:checked')?.value,
+    address: $('#address').value, slot: $('#slot').value, notes: $('#notes').value, website: $('#website').value,
+  };
+  $('#go').disabled = true;
+  try {
+    const r = await fetch('/api/order', {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(body)});
+    const d = await r.json();
+    if (!r.ok) {
+      err.textContent = d.error || 'Something went wrong.'; err.style.display = 'block';
+      if (d.remaining) { remaining = d.remaining; M.items.forEach(i => qty[i.id] = Math.min(qty[i.id], remaining[i.id])); render(); $('#err').textContent = d.error; $('#err').style.display = 'block'; }
+      $('#go') && ($('#go').disabled = false); return;
+    }
+    done(d.order);
+  } catch { err.textContent = 'Network error, please try again.'; err.style.display = 'block'; $('#go').disabled = false; }
+}
+
+function done(o) {
+  const lines = M.items.filter(i => o.items[i.id]).map(i => `${o.items[i.id]} × ${i.name}`);
+  $('#app').replaceChildren(el('div', {className: 'card done'},
+    el('h2', {textContent: 'Order received ☕'}),
+    el('p', {textContent: `Thank you, ${o.name}!`}),
+    ...lines.map(l => el('div', {className: 'val', textContent: l})),
+    el('p', {textContent: `${o.method === 'delivery' ? 'Delivery' : 'Collection'} · ${o.slot}`}),
+    el('div', {className: 'total', style: 'justify-content:center;gap:12px'}, el('span', {textContent: 'Amount to pay:'}), el('span', {textContent: `$${o.total}`})),
+    el('p', {textContent: 'Please pay via PayNow and add your name as the reference.'}),
+    el('img', {src: '/paynow-qr.png', alt: 'PayNow QR code'}),
+    el('p', {className: 'hint', textContent: `Questions? ${M.contactName}, ${M.contactPhone}`})));
+  window.scrollTo(0, 0);
+}
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "bloom-pour-orders",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pre-order app for Bloom Pour pour-over coffee (Netlify)",
+  "scripts": {
+    "dev": "LOCAL_STORE=1 ADMIN_PASSWORD=${ADMIN_PASSWORD:-test} node scripts/dev-server.mjs",
+    "test": "LOCAL_STORE=1 ADMIN_PASSWORD=test node scripts/test.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.2.0"
+  }
+}

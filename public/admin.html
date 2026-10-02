@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex"><title>Bloom Pour – Orders</title>
+<style>
+:root{--bg:#ececec;--accent:#e8620a;--text:#b84a00}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+main{max-width:1000px;margin:0 auto;padding:24px 16px 60px}h1{color:var(--accent);margin:0 0 14px}
+input,button{font-size:16px;padding:10px;border-radius:10px;border:2px solid var(--accent)}button{background:var(--accent);color:#fff;font-weight:bold;cursor:pointer}
+.sum{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}.chip{background:#f6f6f6;border:2px solid var(--accent);border-radius:14px;padding:10px 14px}
+.chip b{display:block;font-size:22px;color:var(--accent)}
+.wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;background:#f6f6f6}th,td{border-bottom:1px solid #ccc;padding:8px;text-align:left;font-size:14px;vertical-align:top}
+th{color:var(--accent)}tr.x{opacity:.45;text-decoration:line-through}.err{color:#c0392b;margin-top:8px}
+td button{padding:4px 8px;font-size:13px}
+</style></head><body><main>
+<h1>Bloom Pour – Orders</h1>
+<div id="login"><input id="pw" type="password" placeholder="Admin password"> <button id="in">View orders</button><div class="err" id="err"></div></div>
+<div id="dash" hidden>
+  <div class="sum" id="sum"></div>
+  <button id="csv">Download CSV</button> <button id="refresh">Refresh</button>
+  <div class="wrap"><table><thead><tr><th>Time</th><th>Name</th><th>Phone</th><th>Order</th><th>$</th><th>Method</th><th>Window</th><th>Address / notes</th><th>Paid</th><th>Done</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+</div>
+<script>
+const $=s=>document.querySelector(s);let pw=sessionStorage.getItem('pw')||'',data;
+async function call(method='GET',body){const r=await fetch('/api/admin',{method,headers:{'x-admin-password':pw,'content-type':'application/json'},body:body&&JSON.stringify(body)});const d=await r.json();if(!r.ok)throw new Error(d.error||'Error');return d}
+function cell(t,c){const td=document.createElement('td');if(c)td.className=c;td.append(t);return td}
+function btn(label,fn){const b=document.createElement('button');b.textContent=label;b.onclick=fn;return b}
+function draw(){
+  const {menu,orders,remaining}=data;const live=orders.filter(o=>!o.cancelled);
+  $('#sum').replaceChildren(...menu.items.map(i=>{const sold=live.reduce((s,o)=>s+(o.items[i.id]||0),0);const c=document.createElement('div');c.className='chip';c.innerHTML='<b></b><span></span>';c.querySelector('b').textContent=`${sold}/${i.cap}`;c.querySelector('span').textContent=i.name;return c}),
+    (()=>{const c=document.createElement('div');c.className='chip';c.innerHTML='<b></b><span>Revenue (paid / total)</span>';c.querySelector('b').textContent=`$${live.filter(o=>o.paid).reduce((s,o)=>s+o.total,0)} / $${live.reduce((s,o)=>s+o.total,0)}`;return c})());
+  $('#rows').replaceChildren(...orders.map(o=>{const tr=document.createElement('tr');if(o.cancelled)tr.className='x';
+    const order=menu.items.filter(i=>o.items[i.id]).map(i=>`${o.items[i.id]}× ${i.name}`).join(', ');
+    const t=new Date(o.createdAt).toLocaleString('en-SG',{timeZone:'Asia/Singapore',dateStyle:'short',timeStyle:'short'});
+    const paid=document.createElement('input');paid.type='checkbox';paid.checked=o.paid;paid.onchange=()=>patch({id:o.id,paid:paid.checked});
+    const done=document.createElement('input');done.type='checkbox';done.checked=o.collected;done.onchange=()=>patch({id:o.id,collected:done.checked});
+    const td=document.createElement('td');td.append(btn(o.cancelled?'Restore':'Cancel',()=>patch({id:o.id,cancelled:!o.cancelled})));
+    const pc=document.createElement('td');pc.append(paid);const dc=document.createElement('td');dc.append(done);
+    tr.append(cell(t),cell(o.name),cell(o.phone),cell(order),cell('$'+o.total),cell(o.method),cell(o.slot),cell([o.address,o.notes].filter(Boolean).join(' · ')),pc,dc,td);return tr}));
+}
+async function patch(b){try{data=await call('PATCH',b);draw()}catch(e){alert(e.message)}}
+async function show(){try{data=await call();sessionStorage.setItem('pw',pw);$('#login').hidden=true;$('#dash').hidden=false;draw()}catch(e){$('#err').textContent=e.message}}
+$('#in').onclick=()=>{pw=$('#pw').value;show()};$('#pw').onkeydown=e=>{if(e.key==='Enter')$('#in').click()};$('#refresh').onclick=show;
+$('#csv').onclick=()=>{const {menu,orders}=data;const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const head=['Time','Name','Phone',...menu.items.map(i=>i.name),'Total','Method','Window','Address','Notes','Paid','Collected','Cancelled'];
+  const rows=orders.map(o=>[new Date(o.createdAt).toISOString(),o.name,o.phone,...menu.items.map(i=>o.items[i.id]||0),o.total,o.method,o.slot,o.address,o.notes,o.paid,o.collected,o.cancelled]);
+  const blob=new Blob([[head,...rows].map(r=>r.map(q).join(',')).join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bloom-pour-orders.csv';a.click()};
+if(pw)show();
+</script></main></body></html>
