@@ -168,7 +168,9 @@ function done(o) {
     el('div', {className: 'total', style: 'justify-content:center;gap:12px'}, el('span', {textContent: 'Amount to pay:'}), el('span', {textContent: `$${o.total}`})),
     el('p', {textContent: 'Please pay via PayNow and add your name as the reference.'}),
     el('img', {src: '/paynow-qr.png', alt: 'PayNow QR code'}),
-    el('p', {className: 'hint', textContent: `Questions? ${M.contactName}, ${M.contactPhone}`})));
+    el('p', {className: 'hint'}, el('a', {
+      href: `https://wa.me/65${M.contactPhone}?text=${encodeURIComponent('Hi, here is my PayNow screenshot for my Bloom Pour order (' + o.name + ', $' + o.total + ').')}`,
+      target: '_blank', rel: 'noopener', textContent: 'Send your screenshot'}))));
   window.scrollTo(0, 0);
 }
 load();
