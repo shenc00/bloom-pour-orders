@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
-import { ordersStore } from "./lib/store.mjs";
-import { remainingStock, byCreated, json } from "./lib/logic.mjs";
+import { ordersStore, libraryStore, salesStore } from "./lib/store.mjs";
+import { remainingStock, byCreated, inSale, fullName, json } from "./lib/logic.mjs";
+import { listSales, getLibrary, pick, COFFEE_FIELDS, PUBLIC_FIELDS } from "./lib/sale.mjs";
 import { MENU } from "./lib/menu.mjs";
 
 function authorised(req) {
@@ -9,6 +10,52 @@ function authorised(req) {
   const given = Buffer.from(req.headers.get("x-admin-password") || "");
   const want = Buffer.from(pw);
   return given.length === want.length && timingSafeEqual(given, want);
+}
+
+const clean = (v, max = 120) => String(v ?? "").trim().slice(0, max);
+const lines = (v) => String(v ?? "").split("\n").map((l) => clean(l)).filter(Boolean);
+const newId = () => crypto.randomUUID().slice(0, 8);
+
+// Library and sale edits. Returns an error message, or nothing on success.
+async function act(b) {
+  const library = libraryStore(), sales = salesStore();
+  if (b.action === "coffee.save") {
+    if (b.id === "_seeded") return "Coffee not found.";
+    await getLibrary();
+    if (b.id && !(await library.get(b.id))) return "Coffee not found.";
+    const c = { id: b.id || newId() };
+    for (const f of COFFEE_FIELDS) c[f] = clean(b[f], f === "note" || f === "brewMethod" ? 600 : 120);
+    if (!c.name) return "Coffee needs a name.";
+    return void (await library.put(c));
+  }
+  if (b.action === "coffee.delete") {
+    if (b.id === "_seeded") return "Coffee not found.";
+    return void (await library.del(b.id)); // past sales keep their own copy, so they are unaffected
+  }
+  if (b.action === "sale.save") {
+    const byId = Object.fromEntries((await getLibrary()).map((c) => [c.id, c]));
+    const items = [];
+    for (const x of Array.isArray(b.items) ? b.items : []) {
+      const c = byId[x.id];
+      if (!c) return "A picked coffee is no longer in the library.";
+      const price = Number(x.price), cap = Number(x.cap);
+      if (!(price > 0) || !Number.isInteger(cap) || cap < 1) return `Check price and cups for ${fullName(c)}.`;
+      items.push({ id: c.id, ...pick(c, PUBLIC_FIELDS), price, cap });
+    }
+    if (!items.length) return "Pick at least one coffee.";
+    const sale = {
+      eventDate: clean(b.eventDate), hours: clean(b.hours), slots: lines(b.slots),
+      collectionPoint: clean(b.collectionPoint) || MENU.collectionPoint, notes: lines(b.notes), items,
+    };
+    if (!sale.eventDate || !sale.hours || !sale.slots.length) return "Date, hours and at least one time window are needed.";
+    if (b.batch) { // edit the live sale in place; orders keep counting against it
+      const old = await sales.get(b.batch);
+      if (!old) return "Sale not found.";
+      Object.assign(sale, { id: old.id, publishedAt: old.publishedAt });
+    } else Object.assign(sale, { id: newId(), publishedAt: Date.now() });
+    return void (await sales.put(sale));
+  }
+  return "Unknown action.";
 }
 
 export default async (req) => {
@@ -26,7 +73,17 @@ export default async (req) => {
     if (typeof cancelled === "boolean") o.cancelled = cancelled;
     await store.put(o);
   }
-  const orders = (await store.list()).sort(byCreated);
-  return json({ menu: MENU, orders, remaining: remainingStock(orders) });
+  if (req.method === "POST") {
+    let body;
+    try { body = await req.json(); } catch { return json({ error: "Bad request" }, 400); }
+    const error = await act(body);
+    if (error) return json({ error }, 400);
+  }
+
+  const all = await store.list();
+  const sales = await listSales(all);
+  const menu = sales.find((s) => s.id === new URL(req.url).searchParams.get("sale")) ?? sales[0];
+  const orders = all.filter((o) => inSale(o, menu)).sort(byCreated);
+  return json({ menu, sales, orders, remaining: remainingStock(all, menu), library: await getLibrary() });
 };
 export const config = { path: "/api/admin" };

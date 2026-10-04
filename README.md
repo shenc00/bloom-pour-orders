@@ -3,8 +3,12 @@
 Mobile-friendly order page for Bloom Pour pour-over coffee, built for Netlify.
 
 - **`/`** – customers pick cups (stock shown live), enter name and contact number, choose collection or free delivery (4+ cups, within Ki Residences), pick a time window, then see the PayNow QR and amount to pay.
-- **`/admin`** – password-protected order list: totals per coffee, paid / collected ticks, cancel, CSV download.
-- Stock limits (Gesha 3, Landrace 3, Kenya 10) are enforced on the server, so two people can't take the last cup.
+- **`/coffees`** – the whole coffee library for customers (name, origin, process, roast, taste, note, roastery). Coffees not on sale this round are greyed out. Brew method is never shown.
+- **`/admin`** – password-protected, three tabs:
+  - **Orders**: per sale (current and past), totals per coffee, paid / collected ticks, cancel, CSV download.
+  - **Coffee library**: add, edit and delete coffees, including a private brew method field.
+  - **Sale setup**: date, hours, time windows, and which library coffees are on sale with price and cups. *Publish as new sale* starts fresh stock and orders; *Update current sale* edits the live one.
+- Stock limits are per sale and enforced on the server, so two people can't take the last cup.
 - Orders are stored in Netlify Blobs. No database or Google account needed.
 
 ## Deploy on Netlify
@@ -14,10 +18,11 @@ Mobile-friendly order page for Bloom Pour pour-over coffee, built for Netlify.
 4. Share the site URL with customers. Open `your-site.netlify.app/admin` to see orders.
 
 ## Editing
-- Menu, prices, stock caps, time windows, delivery rule, contact: `netlify/functions/lib/menu.mjs`
+- Each sale (date, hours, coffees, prices, cups, time windows): `/admin` → Sale setup. No redeploy needed.
+- Fixed settings (contact number, estate, free-delivery rule) and the fallback menu used before the first sale is published: `netlify/functions/lib/menu.mjs`. The coffee library is pre-loaded once from this file.
 - PayNow QR: replace `public/paynow-qr.png`. **The current QR expires 5 Oct 2026.**
 - Look and feel: the `<style>` block in `public/index.html`.
-- To reset stock/orders for a new batch, delete the `orders` store in Netlify → **Blobs**.
+- Orders from earlier sales are kept (Blobs stores `orders`, `library`, `sales`). Publishing a new sale resets stock automatically; nothing needs deleting.
 
 ## Local development
 ```

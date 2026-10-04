@@ -1,4 +1,5 @@
-// Single source of truth for the menu. Edit here, commit, and Netlify redeploys.
+// Fallback menu and fixed shop settings. Day to day, sales are set up in /admin (Sale setup);
+// this file is used until the first sale is published, and for settings that rarely change.
 export const MENU = {
   shop: "Bloom Pour",
   tagline: "Pour over menu",
@@ -15,11 +16,11 @@ export const MENU = {
   ],
   slots: ["8.30am – 10am", "10am – 12pm", "12pm – 2pm", "2pm – 4pm"],
   items: [
-    { id: "gesha", name: "Colombia Diviso Gesha", price: 7, cap: 3,
+    { id: "gesha", origin: "Colombia", name: "Diviso Gesha", price: 7, cap: 3,
       process: "Double Anaerobic, Washed", taste: "Lemongrass, Figs, Grapefruit finish" },
-    { id: "landrace", name: "Colombia Diviso Landrace", price: 6, cap: 3,
+    { id: "landrace", origin: "Colombia", name: "Diviso Landrace", price: 6, cap: 3,
       process: "Double Anaerobic, Washed", taste: "Berries, Lavender, Apricot" },
-    { id: "kenya", name: "Kenya AB Mwirua Getuya", price: 6, cap: 10,
+    { id: "kenya", origin: "Kenya", name: "AB Mwirua Getuya", price: 6, cap: 10,
       process: "Washed", taste: "Currants, Rosehip, Brown Sugar, Strawberry Tea" },
   ],
 };

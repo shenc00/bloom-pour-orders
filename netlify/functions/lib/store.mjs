@@ -1,16 +1,18 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-// On Netlify (and `netlify dev`) orders live in Netlify Blobs.
+// On Netlify (and `netlify dev`) records live in Netlify Blobs.
 // For plain local runs/tests set LOCAL_STORE=1 to use ./.data instead.
-export function ordersStore() {
-  if (process.env.LOCAL_STORE === "1") return localStore();
-  return blobStore();
-}
+// Every record is a JSON object with a string `id`.
+const makeStore = (name) => (process.env.LOCAL_STORE === "1" ? localStore(name) : blobStore(name));
 
-function blobStore() {
+export const ordersStore = () => makeStore("orders");
+export const libraryStore = () => makeStore("library");
+export const salesStore = () => makeStore("sales");
+
+function blobStore(name) {
   let s;
-  const store = async () => (s ??= (await import("@netlify/blobs")).getStore({ name: "orders", consistency: "strong" }));
+  const store = async () => (s ??= (await import("@netlify/blobs")).getStore({ name, consistency: "strong" }));
   return {
     async list() {
       const s = await store();
@@ -24,8 +26,8 @@ function blobStore() {
   };
 }
 
-function localStore() {
-  const dir = path.resolve(".data/orders");
+function localStore(name) {
+  const dir = path.resolve(".data", name);
   const file = (id) => path.join(dir, `${id}.json`);
   return {
     async list() {

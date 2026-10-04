@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bloom Pour – Our Coffees</title>
+<style>
+:root{--bg:#DEE5DE;--accent:#98a7c8;--text:#8595a4;--grey:#c1cbd4;--ink:#3d4a57;--card:rgba(255,255,255,.55);--line:#98a7c8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;line-height:1.45}
+main{max-width:640px;margin:0 auto;padding:32px 16px 64px}
+h1{margin:0;text-align:center;font-size:clamp(40px,12vw,64px);color:var(--accent);letter-spacing:1px;line-height:1.05}
+.sub{text-align:center;font-size:20px;margin:6px 0 18px;text-transform:uppercase}
+hr{border:0;border-top:3px solid var(--line);margin:18px 0}
+.card{background:var(--card);border:3px solid var(--line);border-radius:26px;padding:20px 22px;margin:16px 0}
+.card.off{color:var(--grey);border-color:var(--grey)}
+.name{font-size:22px;font-weight:bold}
+.val{font-size:16px;margin-top:4px}
+.note{font-size:15px;margin-top:10px;font-style:italic}
+.tag{display:inline-block;margin-top:10px;font-size:13px;font-weight:bold;text-transform:uppercase}
+.btn{display:block;text-align:center;text-decoration:none;width:100%;padding:16px;font-size:18px;font-weight:bold;border-radius:14px;background:var(--accent);color:var(--ink)}
+</style>
+</head>
+<body>
+<main>
+  <h1>BLOOM POUR</h1>
+  <div class="sub">Our coffees</div>
+  <hr>
+  <div id="app"><p>Loading…</p></div>
+  <hr>
+  <a class="btn" href="/">← Back to order page</a>
+</main>
+<script>
+const el = (t, props = {}, ...kids) => { const e = Object.assign(document.createElement(t), props); kids.flat().forEach(k => e.append(k)); return e; };
+fetch('/api/coffees').then(r => r.json()).then(({coffees}) => {
+  document.getElementById('app').replaceChildren(...coffees.map(c => el('div', {className: 'card' + (c.onSale ? '' : ' off')},
+    el('div', {className: 'name', textContent: [c.origin, c.name].filter(Boolean).join(' ')}),
+    c.process ? el('div', {className: 'val', textContent: c.roast ? `${c.process} (${c.roast.replace(/\s*roast$/i, '').toLowerCase()} roast)` : c.process}) : '',
+    c.taste ? el('div', {className: 'val', textContent: c.taste}) : '',
+    c.note ? el('div', {className: 'note', textContent: c.note}) : '',
+    c.roastery ? el('div', {className: 'val', textContent: `Roastery: ${c.roastery}`}) : '',
+    c.onSale ? '' : el('div', {className: 'tag', textContent: 'Not on sale this round'}))));
+}).catch(() => { document.getElementById('app').textContent = 'Could not load coffees. Please try again.'; });
+</script>
+</body>
+</html>

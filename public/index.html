@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bloom Pour – Pour Over Orders</title>
 <style>
-:root{--bg:#ececec;--accent:#e8620a;--text:#b84a00;--card:#f6f6f6;--line:#e8620a}
+:root{--bg:#DEE5DE;--accent:#98a7c8;--text:#8595a4;--grey:#c1cbd4;--ink:#3d4a57;--card:rgba(255,255,255,.55);--line:#98a7c8}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;line-height:1.45}
 main{max-width:640px;margin:0 auto;padding:32px 16px 64px}
@@ -16,22 +16,23 @@ hr{border:0;border-top:3px solid var(--line);margin:18px 0}
 .info b{color:var(--accent)}
 .card{background:var(--card);border:3px solid var(--line);border-radius:26px;padding:20px 22px;margin:16px 0}
 .row{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.name{font-size:22px;font-weight:bold}.price{font-size:26px;font-weight:bold;color:var(--accent)}
-.lbl{font-size:13px;color:var(--accent);text-transform:uppercase;margin-top:8px}
-.val{font-size:16px}
+.name{font-size:22px;font-weight:bold}.price{font-size:26px;font-weight:bold;color:var(--ink)}
+.card.out,.card.out .price{color:var(--grey);border-color:var(--grey)}
+.card.out .name{text-decoration:line-through}
+.val{font-size:16px;margin-top:4px}
 .stepper{display:flex;align-items:center;gap:12px}
 .stepper button{width:40px;height:40px;border-radius:50%;border:2px solid var(--accent);background:transparent;color:var(--accent);font-size:22px;cursor:pointer}
 .stepper button:disabled{opacity:.35;cursor:default}
 .qty{min-width:24px;text-align:center;font-size:22px;font-weight:bold}
-.left{font-size:13px}.soldout{color:#777;font-weight:bold}
+.left{font-size:13px}.soldout{color:var(--grey);font-weight:bold}
 h2{font-size:18px;margin:26px 0 8px;text-transform:uppercase;color:var(--accent)}
 label{display:block;font-size:14px;margin:12px 0 4px}
-input[type=text],input[type=tel],select,textarea{width:100%;padding:12px;font-size:16px;border:2px solid var(--line);border-radius:12px;background:#fff;color:#7a3000;font-family:inherit}
+input[type=text],input[type=tel],select,textarea{width:100%;padding:12px;font-size:16px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-family:inherit}
 .opt{display:flex;gap:10px;align-items:flex-start;margin:8px 0;font-size:16px}
 .opt input{margin-top:4px;accent-color:var(--accent)}
 .hint{font-size:13px;margin-top:4px}
 .total{display:flex;justify-content:space-between;font-size:22px;font-weight:bold;margin:22px 0 10px}
-.btn{width:100%;padding:16px;font-size:18px;font-weight:bold;border:0;border-radius:14px;background:var(--accent);color:#fff;cursor:pointer}
+.btn{width:100%;padding:16px;font-size:18px;font-weight:bold;border:0;border-radius:14px;background:var(--accent);color:var(--ink);cursor:pointer}
 .btn:disabled{opacity:.5}
 .err{background:#fff;border:2px solid #c0392b;color:#c0392b;border-radius:12px;padding:10px 12px;margin-top:12px;display:none}
 .hp{position:absolute;left:-9999px}
@@ -41,7 +42,7 @@ input[type=text],input[type=tel],select,textarea{width:100%;padding:12px;font-si
 .back{margin-top:6px;background:none;border:2px solid var(--accent);color:var(--accent);font-size:16px;font-weight:bold;padding:10px 16px;border-radius:12px;cursor:pointer}
 .notice{background:#fff;border:2px solid var(--accent);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:14px}
 .done .back{display:block;margin:6px auto}
-.foot{text-align:center;margin-top:28px}
+.foot{display:block;text-align:center;text-decoration:none;margin-top:8px}
 .hidden{display:none}
 </style>
 </head>
@@ -53,7 +54,7 @@ input[type=text],input[type=tel],select,textarea{width:100%;padding:12px;font-si
   <div id="info" class="info"></div>
   <div id="app"><p class="info">Loading menu…</p></div>
   <hr>
-  <div class="foot">Brewed fresh, cup by cup.</div>
+  <a class="btn foot" href="/coffees">Our coffees</a>
 </main>
 <script>
 const $ = (s) => document.querySelector(s);
@@ -73,8 +74,7 @@ function render() {
   const info = $('#info'); info.replaceChildren(
     el('div', {}, el('b', {textContent: `${M.eventDate} · ${M.hours}`})),
     el('div', {textContent: M.notes.join(' · ')}),
-    el('div', {textContent: `Free delivery within ${M.estate} for ${M.freeDeliveryMinCups} cups or more. Fewer than ${M.freeDeliveryMinCups}: self-collection at ${M.collectionPoint}.`}),
-    el('div', {textContent: `Enquiries: ${M.contactName}, ${M.contactPhone}`}));
+    el('div', {textContent: `Free delivery within ${M.estate} for ${M.freeDeliveryMinCups} cups or more. Fewer than ${M.freeDeliveryMinCups}: self-collection at ${M.collectionPoint}.`}));
 
   const soldOut = M.items.every(i => remaining[i.id] === 0);
   const app = $('#app');
@@ -89,10 +89,10 @@ function render() {
     minus.onclick = () => { qty[i.id]--; render(); keep(); };
     plus.onclick = () => { qty[i.id]++; render(); keep(); };
     stepper.append(minus, el('span', {className: 'qty', textContent: qty[i.id]}), plus);
-    form.append(el('div', {className: 'card'},
-      el('div', {className: 'row'}, el('span', {className: 'name', textContent: i.name}), el('span', {className: 'price', textContent: `$${i.price}`})),
-      el('div', {className: 'lbl', textContent: 'Process'}), el('div', {className: 'val', textContent: i.process}),
-      el('div', {className: 'lbl', textContent: 'Taste profile'}), el('div', {className: 'val', textContent: i.taste}),
+    form.append(el('div', {className: 'card' + (left ? '' : ' out')},
+      el('div', {className: 'row'}, el('span', {className: 'name', textContent: [i.origin, i.name].filter(Boolean).join(' ')}), el('span', {className: 'price', textContent: `$${i.price}`})),
+      el('div', {className: 'val', textContent: i.roast ? `${i.process} (${i.roast.replace(/\s*roast$/i, '').toLowerCase()} roast)` : i.process}),
+      el('div', {className: 'val', textContent: i.taste}),
       el('div', {className: 'row', style: 'margin-top:14px'},
         el('span', left ? {className: 'left', textContent: `${left} cup${left > 1 ? 's' : ''} left`} : {className: 'soldout', textContent: 'SOLD OUT'}),
         left ? stepper : '')));

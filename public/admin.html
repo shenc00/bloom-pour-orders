@@ -1,48 +1,115 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex"><title>Bloom Pour – Orders</title>
+<meta name="robots" content="noindex"><title>Bloom Pour – Admin</title>
 <style>
-:root{--bg:#ececec;--accent:#e8620a;--text:#b84a00}
+:root{--bg:#DEE5DE;--accent:#98a7c8;--text:#8595a4;--grey:#c1cbd4;--ink:#3d4a57;--card:rgba(255,255,255,.55)}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-main{max-width:1000px;margin:0 auto;padding:24px 16px 60px}h1{color:var(--accent);margin:0 0 14px}
-input,button{font-size:16px;padding:10px;border-radius:10px;border:2px solid var(--accent)}button{background:var(--accent);color:#fff;font-weight:bold;cursor:pointer}
-.sum{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}.chip{background:#f6f6f6;border:2px solid var(--accent);border-radius:14px;padding:10px 14px}
-.chip b{display:block;font-size:22px;color:var(--accent)}
-.wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;background:#f6f6f6}th,td{border-bottom:1px solid #ccc;padding:8px;text-align:left;font-size:14px;vertical-align:top}
-th{color:var(--accent)}tr.x{opacity:.45;text-decoration:line-through}.err{color:#c0392b;margin-top:8px}
+main{max-width:1000px;margin:0 auto;padding:24px 16px 60px}h1{color:var(--accent);margin:0 0 14px}h2{color:var(--accent);margin:18px 0 8px;font-size:18px}
+input,select,textarea,button{font:inherit;font-size:16px;padding:10px;border-radius:10px;border:2px solid var(--accent);background:#fff;color:var(--ink)}
+textarea{width:100%}input[type=text],input[type=password],input:not([type]){width:100%}
+button{background:var(--accent);color:var(--ink);font-weight:bold;cursor:pointer}button.alt{background:transparent;color:var(--text)}
+button.danger{background:transparent;border-color:#c0392b;color:#c0392b}
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}.tabs button.on{outline:3px solid var(--ink)}
+label{display:block;font-size:13px;margin:10px 0 3px;text-transform:uppercase}
+.sum{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}.chip{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:10px 14px}
+.chip b{display:block;font-size:22px;color:var(--ink)}
+.wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;background:var(--card)}th,td{border-bottom:1px solid var(--grey);padding:8px;text-align:left;font-size:14px;vertical-align:top}
+th{color:var(--accent)}tr.x{opacity:.45;text-decoration:line-through}.err{color:#c0392b;margin-top:8px}.ok{color:var(--ink);margin-top:8px}
 td button{padding:4px 8px;font-size:13px}
+.card{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:12px 14px;margin:8px 0;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.card small{display:block}.pick{display:grid;grid-template-columns:auto 1fr 90px 90px;gap:8px;align-items:center;margin:6px 0}
+.pick input[type=checkbox]{width:20px;height:20px}.pick input[type=number]{width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}[hidden]{display:none!important}
 </style></head><body><main>
-<h1>Bloom Pour – Orders</h1>
-<div id="login"><input id="pw" type="password" placeholder="Admin password"> <button id="in">View orders</button><div class="err" id="err"></div></div>
+<h1>Bloom Pour – Admin</h1>
+<div id="login"><input id="pw" type="password" placeholder="Admin password" style="max-width:300px"> <button id="in">Log in</button><div class="err" id="err"></div></div>
 <div id="dash" hidden>
-  <div class="sum" id="sum"></div>
-  <button id="csv">Download CSV</button> <button id="refresh">Refresh</button>
-  <div class="wrap"><table><thead><tr><th>Time</th><th>Name</th><th>Phone</th><th>Order</th><th>$</th><th>Method</th><th>Window</th><th>Address / notes</th><th>Paid</th><th>Done</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+  <div class="tabs"><button data-t="orders">Orders</button><button data-t="library">Coffee library</button><button data-t="sale">Sale setup</button></div>
+  <div id="msg"></div>
+
+  <section id="t-orders">
+    <label for="salePick">Sale</label><select id="salePick"></select>
+    <div class="sum" id="sum"></div>
+    <button id="csv">Download CSV</button> <button id="refresh" class="alt">Refresh</button>
+    <div class="wrap"><table><thead><tr><th>Time</th><th>Name</th><th>Phone</th><th>Order</th><th>$</th><th>Method</th><th>Window</th><th>Address / notes</th><th>Paid</th><th>Done</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+  </section>
+
+  <section id="t-library" hidden>
+    <h2>Coffees</h2><div id="lib"></div>
+    <h2 id="cfTitle">Add a coffee</h2><form id="cf"></form>
+  </section>
+
+  <section id="t-sale" hidden>
+    <h2>Set up a sale</h2>
+    <div class="hint">Pick coffees from your library. “Publish as new sale” starts fresh stock and a fresh orders list; old sales stay under Orders. “Update current sale” changes the live sale without resetting orders.</div>
+    <form id="sf"></form>
+  </section>
 </div>
 <script>
-const $=s=>document.querySelector(s);let pw=sessionStorage.getItem('pw')||'',data;
-async function call(method='GET',body){const r=await fetch('/api/admin',{method,headers:{'x-admin-password':pw,'content-type':'application/json'},body:body&&JSON.stringify(body)});const d=await r.json();if(!r.ok)throw new Error(d.error||'Error');return d}
+const $=s=>document.querySelector(s);let pw=sessionStorage.getItem('pw')||'',data,tab='orders',sel='',editing=null;
+const el=(t,p={},...k)=>{const e=Object.assign(document.createElement(t),p);k.flat().forEach(x=>e.append(x));return e};
+const full=i=>[i.origin,i.name].filter(Boolean).join(' ');
+const say=(t,bad)=>{$('#msg').replaceChildren(el('div',{className:bad?'err':'ok',textContent:t}))};
+async function call(method='GET',body){const r=await fetch('/api/admin?sale='+encodeURIComponent(sel),{method,headers:{'x-admin-password':pw,'content-type':'application/json'},body:body&&JSON.stringify(body)});const d=await r.json();if(!r.ok)throw new Error(d.error||'Error');return d}
 function cell(t,c){const td=document.createElement('td');if(c)td.className=c;td.append(t);return td}
-function btn(label,fn){const b=document.createElement('button');b.textContent=label;b.onclick=fn;return b}
-function draw(){
-  const {menu,orders,remaining}=data;const live=orders.filter(o=>!o.cancelled);
-  $('#sum').replaceChildren(...menu.items.map(i=>{const sold=live.reduce((s,o)=>s+(o.items[i.id]||0),0);const c=document.createElement('div');c.className='chip';c.innerHTML='<b></b><span></span>';c.querySelector('b').textContent=`${sold}/${i.cap}`;c.querySelector('span').textContent=i.name;return c}),
-    (()=>{const c=document.createElement('div');c.className='chip';c.innerHTML='<b></b><span>Revenue (paid / total)</span>';c.querySelector('b').textContent=`$${live.filter(o=>o.paid).reduce((s,o)=>s+o.total,0)} / $${live.reduce((s,o)=>s+o.total,0)}`;return c})());
+function btn(label,fn,cls=''){const b=el('button',{type:'button',textContent:label,className:cls});b.onclick=fn;return b}
+async function act(body,done){try{data=await call('POST',body);draw();say(done)}catch(e){say(e.message,true)}}
+
+function drawOrders(){
+  const {menu,orders,sales}=data;const live=orders.filter(o=>!o.cancelled);
+  $('#salePick').replaceChildren(...sales.map((s,i)=>el('option',{value:s.id,textContent:`${s.eventDate}${i?'':' (current)'}`,selected:s.id===menu.id})));
+  $('#sum').replaceChildren(...menu.items.map(i=>{const sold=live.reduce((s,o)=>s+(o.items[i.id]||0),0);return el('div',{className:'chip'},el('b',{textContent:`${sold}/${i.cap}`}),el('span',{textContent:full(i)}))}),
+    el('div',{className:'chip'},el('b',{textContent:`$${live.filter(o=>o.paid).reduce((s,o)=>s+o.total,0)} / $${live.reduce((s,o)=>s+o.total,0)}`}),el('span',{textContent:'Revenue (paid / total)'})));
   $('#rows').replaceChildren(...orders.map(o=>{const tr=document.createElement('tr');if(o.cancelled)tr.className='x';
-    const order=menu.items.filter(i=>o.items[i.id]).map(i=>`${o.items[i.id]}× ${i.name}`).join(', ');
+    const order=menu.items.filter(i=>o.items[i.id]).map(i=>`${o.items[i.id]}× ${full(i)}`).join(', ');
     const t=new Date(o.createdAt).toLocaleString('en-SG',{timeZone:'Asia/Singapore',dateStyle:'short',timeStyle:'short'});
-    const paid=document.createElement('input');paid.type='checkbox';paid.checked=o.paid;paid.onchange=()=>patch({id:o.id,paid:paid.checked});
-    const done=document.createElement('input');done.type='checkbox';done.checked=o.collected;done.onchange=()=>patch({id:o.id,collected:done.checked});
-    const td=document.createElement('td');td.append(btn(o.cancelled?'Restore':'Cancel',()=>patch({id:o.id,cancelled:!o.cancelled})));
-    const pc=document.createElement('td');pc.append(paid);const dc=document.createElement('td');dc.append(done);
-    tr.append(cell(t),cell(o.name),cell(o.phone),cell(order),cell('$'+o.total),cell(o.method),cell(o.slot),cell([o.address,o.notes].filter(Boolean).join(' · ')),pc,dc,td);return tr}));
+    const paid=el('input',{type:'checkbox',checked:o.paid,onchange:()=>patch({id:o.id,paid:paid.checked})});
+    const done=el('input',{type:'checkbox',checked:o.collected,onchange:()=>patch({id:o.id,collected:done.checked})});
+    tr.append(cell(t),cell(o.name),cell(o.phone),cell(order),cell('$'+o.total),cell(o.method),cell(o.slot),cell([o.address,o.notes].filter(Boolean).join(' · ')),cell(paid),cell(done),cell(btn(o.cancelled?'Restore':'Cancel',()=>patch({id:o.id,cancelled:!o.cancelled}))));return tr}));
 }
+
+const FIELDS=[['name','Name (e.g. El Diviso Geisha)'],['origin','Origin (e.g. Colombia)'],['process','Process (e.g. Washed)'],['roast','Roast (e.g. Light)'],['taste','Taste profile'],['roastery','Roastery'],['note','Short note','t'],['brewMethod','Brew method (private, only you see this)','t']];
+function drawLibrary(){
+  $('#lib').replaceChildren(...data.library.map(c=>el('div',{className:'card'},el('span',{},el('b',{textContent:full(c)}),el('small',{textContent:[c.process,c.roast,c.roastery].filter(Boolean).join(' · ')})),btn('Edit',()=>{editing=c;drawLibrary();window.scrollTo(0,document.body.scrollHeight)}))),
+    data.library.length?'':'No coffees yet.');
+  $('#cfTitle').textContent=editing?`Edit ${full(editing)}`:'Add a coffee';
+  const f=$('#cf');f.replaceChildren(...FIELDS.flatMap(([k,l,t])=>[el('label',{textContent:l}),el(t?'textarea':'input',{id:'cf_'+k,rows:2,value:editing?.[k]||'',maxLength:t?600:120})]),
+    el('div',{className:'row'},el('button',{type:'submit',textContent:editing?'Save changes':'Add coffee'}),
+      editing?btn('Cancel',()=>{editing=null;drawLibrary()},'alt'):'',
+      editing?btn('Delete',()=>{if(confirm(`Delete ${full(editing)} from the library? Past and current sales keep their own copy.`)){const id=editing.id;editing=null;act({action:'coffee.delete',id},'Coffee deleted.')}},'danger'):''));
+  f.onsubmit=e=>{e.preventDefault();const b={action:'coffee.save',id:editing?.id};FIELDS.forEach(([k])=>b[k]=$('#cf_'+k).value);const id=editing?.id;editing=null;act(b,id?'Coffee saved.':'Coffee added.')};
+}
+
+function drawSale(){
+  const cur=data.sales[0],live=cur.id!=='legacy';
+  const inCur=Object.fromEntries(cur.items.map(i=>[i.id,i]));
+  const f=$('#sf');
+  const txt=(id,l,v,ta)=>[el('label',{textContent:l}),el(ta?'textarea':'input',{id,value:v,rows:4})];
+  f.replaceChildren(...txt('s_date','Date (shown on main page)',cur.eventDate),...txt('s_hours','Operating hours',cur.hours),
+    ...txt('s_cp','Collection point',cur.collectionPoint),...txt('s_slots','Time windows (one per line)',cur.slots.join('\n'),1),...txt('s_notes','Notes on main page (one per line)',cur.notes.join('\n'),1),
+    el('label',{textContent:'Coffees on sale (price $ / cups)'}),
+    ...data.library.map(c=>{const o=inCur[c.id];return el('div',{className:'pick'},el('input',{type:'checkbox',id:'p_'+c.id,checked:!!o}),el('span',{textContent:full(c)}),el('input',{type:'number',id:'pr_'+c.id,min:0,step:'0.5',placeholder:'$',value:o?.price??''}),el('input',{type:'number',id:'cp_'+c.id,min:1,step:1,placeholder:'cups',value:o?.cap??''}))}),
+    data.library.length?'':'Add coffees in the Coffee library first.',
+    el('div',{className:'row'},el('button',{type:'submit',textContent:'Publish as new sale'}),live?btn('Update current sale',()=>save(cur.id),'alt'):''));
+  const body=batch=>({action:'sale.save',batch,eventDate:$('#s_date').value,hours:$('#s_hours').value,collectionPoint:$('#s_cp').value,slots:$('#s_slots').value,notes:$('#s_notes').value,
+    items:data.library.filter(c=>$('#p_'+c.id).checked).map(c=>({id:c.id,price:$('#pr_'+c.id).value,cap:$('#cp_'+c.id).value}))});
+  const save=batch=>{sel='';act(body(batch),batch?'Current sale updated.':'New sale published. Stock and orders start fresh.')};
+  f.onsubmit=e=>{e.preventDefault();if(confirm('Publish a new sale? The main page switches to it straight away and stock starts fresh.'))save()};
+}
+
+function draw(){
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
+  ['orders','library','sale'].forEach(t=>$('#t-'+t).hidden=t!==tab);
+  ({orders:drawOrders,library:drawLibrary,sale:drawSale})[tab]();
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;$('#msg').replaceChildren();draw()});
+$('#salePick').onchange=e=>{sel=e.target.value;show()};
 async function patch(b){try{data=await call('PATCH',b);draw()}catch(e){alert(e.message)}}
 async function show(){try{data=await call();sessionStorage.setItem('pw',pw);$('#login').hidden=true;$('#dash').hidden=false;draw()}catch(e){$('#err').textContent=e.message}}
 $('#in').onclick=()=>{pw=$('#pw').value;show()};$('#pw').onkeydown=e=>{if(e.key==='Enter')$('#in').click()};$('#refresh').onclick=show;
 $('#csv').onclick=()=>{const {menu,orders}=data;const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const head=['Time','Name','Phone',...menu.items.map(i=>i.name),'Total','Method','Window','Address','Notes','Paid','Collected','Cancelled'];
+  const head=['Time','Name','Phone',...menu.items.map(full),'Total','Method','Window','Address','Notes','Paid','Collected','Cancelled'];
   const rows=orders.map(o=>[new Date(o.createdAt).toISOString(),o.name,o.phone,...menu.items.map(i=>o.items[i.id]||0),o.total,o.method,o.slot,o.address,o.notes,o.paid,o.collected,o.cancelled]);
-  const blob=new Blob([[head,...rows].map(r=>r.map(q).join(',')).join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bloom-pour-orders.csv';a.click()};
+  const blob=new Blob([[head,...rows].map(r=>r.map(q).join(',')).join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`bloom-pour-orders-${menu.id}.csv`;a.click()};
 if(pw)show();
 </script></main></body></html>

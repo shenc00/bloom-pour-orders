@@ -5,7 +5,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 const routes = {};
-for (const f of ["menu", "order", "admin", "cancel"]) {
+for (const f of ["menu", "order", "admin", "cancel", "coffees"]) {
   const m = await import(`../netlify/functions/${f}.mjs`);
   routes[m.config.path] = m.default;
 }
@@ -21,7 +21,7 @@ http.createServer(async (req, res) => {
     res.writeHead(r.status, Object.fromEntries(r.headers)); return res.end(Buffer.from(await r.arrayBuffer()));
   }
   let p = url.pathname === "/" ? "/index.html" : url.pathname;
-  if (p === "/admin") p = "/admin.html";
+  if (!path.extname(p)) p += ".html"; // /admin, /coffees
   try {
     const data = await fs.readFile(path.join("public", p));
     res.writeHead(200, { "content-type": types[path.extname(p)] || "application/octet-stream" }); res.end(data);
