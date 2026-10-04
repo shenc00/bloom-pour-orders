@@ -122,10 +122,10 @@ function drawLibrary(){
     data.library.length?'':'No coffees yet.');
   $('#cfTitle').textContent=editing?`Edit ${full(editing)}`:'Add a coffee';
   const f=$('#cf');f.replaceChildren(...FIELDS.flatMap(([k,l,t])=>[el('label',{textContent:l}),el(t==='t'?'textarea':'input',{id:'cf_'+k,rows:2,value:editing?.[k]??'',maxLength:t==='t'?600:120})]),
-    el('div',{className:'qrbox'},el('b',{textContent:'Work out the cost price (private)'}),...CALC.flatMap(([k,l,d])=>numField(k,l,editing?.[k]||d)),el('div',{id:'calcOut',className:'hint',style:'margin-top:10px'})),
-    ...numField('costPrice','Cost price per pour, $ (private, only you see this)',editing?.costPrice),el('div',{className:'hint',textContent:'Filled in from the calculator above. You can type your own.'}),
+    el('div',{className:'qrbox'},el('b',{textContent:'Cost calculator'}),...CALC.flatMap(([k,l,d])=>numField(k,l,editing?.[k]||d)),el('div',{id:'calcOut',className:'hint',style:'margin-top:10px'})),
+    ...numField('costPrice','Cost price per pour, $ (private, only you see this)',editing?.costPrice),el('div',{className:'hint',textContent:'Calculated. Overwrite if necessary.'}),
     ...numField('salesPrice','Sales price per pour, $ (used in Sale setup and on the main page)',editing?.salesPrice),
-    el('div',{className:'hint',textContent:`Auto: (cost price + $${OVERHEAD} overhead) × ${MARKUP} (${(MARKUP-1)*100}% markup), rounded up to the next whole dollar. You can overwrite it.`}),
+    el('div',{className:'hint',textContent:`Profit calculator: (cost price + $${OVERHEAD} overhead) × ${MARKUP} (${(MARKUP-1)*100}% markup), rounded up to the next whole dollar. Overwrite if necessary.`}),
     el('div',{className:'row'},el('button',{type:'submit',textContent:editing?'Save changes':'Add coffee'}),
       editing?btn('Cancel',()=>{editing=null;drawLibrary()},'alt'):'',
       editing?btn('Delete',()=>{if(confirm(`Delete ${full(editing)} from the library? Past and current sales keep their own copy.`)){const id=editing.id;editing=null;act({action:'coffee.delete',id},'Coffee deleted.')}},'danger'):''));
