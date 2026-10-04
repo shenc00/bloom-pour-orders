@@ -35,7 +35,7 @@ const el = (t, props = {}, ...kids) => { const e = Object.assign(document.create
 fetch('/api/coffees').then(r => r.json()).then(({coffees}) => {
   document.getElementById('app').replaceChildren(...coffees.map(c => el('div', {className: 'card' + (c.onSale ? '' : ' off')},
     el('div', {className: 'name', textContent: [c.origin, c.name].filter(Boolean).join(' ')}),
-    c.process ? el('div', {className: 'val', textContent: c.roast ? `${c.process} (${c.roast.replace(/\s*roast$/i, '').toLowerCase()} roast)` : c.process}) : '',
+    c.process ? el('div', {className: 'val', textContent: [c.process, c.roast && c.roast.replace(/\s*roast$/i, '').replace(/^./, m => m.toUpperCase()) + ' roast'].filter(Boolean).join(' | ')}) : '',
     c.taste ? el('div', {className: 'val', textContent: c.taste}) : '',
     c.note ? el('div', {className: 'note', textContent: c.note}) : '',
     c.roastery ? el('div', {className: 'val', textContent: `Roastery: ${c.roastery}`}) : '',

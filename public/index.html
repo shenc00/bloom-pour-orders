@@ -91,7 +91,7 @@ function render() {
     stepper.append(minus, el('span', {className: 'qty', textContent: qty[i.id]}), plus);
     form.append(el('div', {className: 'card' + (left ? '' : ' out')},
       el('div', {className: 'row'}, el('span', {className: 'name', textContent: [i.origin, i.name].filter(Boolean).join(' ')}), el('span', {className: 'price', textContent: `$${i.price}`})),
-      el('div', {className: 'val', textContent: i.roast ? `${i.process} (${i.roast.replace(/\s*roast$/i, '').toLowerCase()} roast)` : i.process}),
+      el('div', {className: 'val', textContent: [i.process, i.roast && i.roast.replace(/\s*roast$/i, '').replace(/^./, m => m.toUpperCase()) + ' roast'].filter(Boolean).join(' | ')}),
       el('div', {className: 'val', textContent: i.taste}),
       el('div', {className: 'row', style: 'margin-top:14px'},
         el('span', left ? {className: 'left', textContent: `${left} cup${left > 1 ? 's' : ''} left`} : {className: 'soldout', textContent: 'SOLD OUT'}),
