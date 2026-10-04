@@ -103,7 +103,8 @@ function drawOrders(){
     tr.append(cell(t),cell(o.name),cell(o.phone),cell(order),cell('$'+o.total),cell(promo),cell(money(f.net(o))),cell(o.method),cell(o.slot),cell([o.address,o.notes].filter(Boolean).join(' · ')),cell(paid),cell(done),cell(btn(o.cancelled?'Restore':'Cancel',()=>patch({id:o.id,cancelled:!o.cancelled}))));return tr}));
 }
 
-const FIELDS=[['name','Name (e.g. El Diviso Geisha)'],['origin','Origin (e.g. Colombia)'],['process','Process (e.g. Washed)'],['roast','Roast (e.g. Light)'],['taste','Taste profile'],['roastery','Roastery'],['note','Short note','t'],['brewMethod','Brew method (private, only you see this)','t']];
+const FIELDS=[['name','Name (e.g. El Diviso Geisha)'],['origin','Origin (e.g. Colombia)'],['process','Process (e.g. Washed)'],['roast','Roast (e.g. Light)'],['taste','Taste profile'],['roastery','Roastery'],['note','Short note','t']];
+const BREW=[['brewRatio','Brew ratio (private, only you see this)','1:15','text'],['brewTemp','Brew temperature, °C (private, only you see this)',95,'number']];
 const CALC=[['bagGrams','Grams in a bag',100],['pourGrams','Grams per pour',15],['bagPrice','Price of the bag (in the currency you paid)',''],['exchangeRate','Exchange rate (that currency per S$1; use 1 if you paid in SGD)',1]];
 const num=k=>parseFloat($('#cf_'+k).value);
 const numField=(k,l,v)=>[el('label',{textContent:l,htmlFor:'cf_'+k}),el('input',{id:'cf_'+k,type:'number',min:0,step:'any',value:v??'',style:'max-width:220px'})];
@@ -122,6 +123,8 @@ function drawLibrary(){
     data.library.length?'':'No coffees yet.');
   $('#cfTitle').textContent=editing?`Edit ${full(editing)}`:'Add a coffee';
   const f=$('#cf');f.replaceChildren(...FIELDS.flatMap(([k,l,t])=>[el('label',{textContent:l}),el(t==='t'?'textarea':'input',{id:'cf_'+k,rows:2,value:editing?.[k]??'',maxLength:t==='t'?600:120})]),
+    ...BREW.flatMap(([k,l,d,type])=>[el('label',{textContent:l,htmlFor:'cf_'+k}),el('input',{id:'cf_'+k,type,...(type==='number'?{min:0,step:'any'}:{maxLength:20}),value:editing?.[k]||d,style:'max-width:220px'})]),
+    editing?.brewMethod?el('div',{className:'hint',textContent:`Old brew method note (kept): ${editing.brewMethod}`}):'',
     el('div',{className:'qrbox'},el('b',{textContent:'Cost calculator'}),...CALC.flatMap(([k,l,d])=>numField(k,l,editing?.[k]||d)),el('div',{id:'calcOut',className:'hint',style:'margin-top:10px'})),
     ...numField('costPrice','Cost price per pour, $ (private, only you see this)',editing?.costPrice),el('div',{className:'hint',textContent:'Calculated. Overwrite if necessary.'}),
     ...numField('salesPrice','Sales price per pour, $ (used in Sale setup and on the main page)',editing?.salesPrice),
@@ -130,7 +133,7 @@ function drawLibrary(){
       editing?btn('Cancel',()=>{editing=null;drawLibrary()},'alt'):'',
       editing?btn('Delete',()=>{if(confirm(`Delete ${full(editing)} from the library? Past and current sales keep their own copy.`)){const id=editing.id;editing=null;act({action:'coffee.delete',id},'Coffee deleted.')}},'danger'):''));
   CALC.forEach(([k])=>$('#cf_'+k).oninput=()=>onCalc(true));$('#cf_costPrice').oninput=onCost;onCalc(false);
-  f.onsubmit=e=>{e.preventDefault();const b={action:'coffee.save',id:editing?.id};[...FIELDS,...CALC,['costPrice'],['salesPrice']].forEach(([k])=>b[k]=$('#cf_'+k).value);const id=editing?.id;editing=null;act(b,id?'Coffee saved.':'Coffee added.')};
+  f.onsubmit=e=>{e.preventDefault();const b={action:'coffee.save',id:editing?.id};[...FIELDS,...BREW,...CALC,['costPrice'],['salesPrice']].forEach(([k])=>b[k]=$('#cf_'+k).value);const id=editing?.id;editing=null;act(b,id?'Coffee saved.':'Coffee added.')};
 }
 
 function drawSale(){

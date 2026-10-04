@@ -46,6 +46,15 @@ let a = await admin(new Request("http://x/api/admin", { headers: { "x-admin-pass
 a = await admin(new Request("http://x/api/admin", { headers: { "x-admin-password": "test" } })); assert.equal(a.status, 200);
 
 // ---- library, sales, batches ----
+{ // an old free-text brewMethod survives edits made through the new form
+  const { libraryStore } = await import("../netlify/functions/lib/store.mjs");
+  await libraryStore().put({ id: "oldbrew", name: "Old Brew", brewMethod: "V60 old note" });
+  const rr = await admin(new Request("http://x/api/admin", { method: "POST", headers: { "x-admin-password": "test" }, body: JSON.stringify({ action: "coffee.save", id: "oldbrew", name: "Old Brew", brewRatio: "1:16", brewTemp: "94" }) }));
+  assert.equal(rr.status, 200);
+  const kept = (await (await rr.json()).library).find((c) => c.id === "oldbrew");
+  assert.equal(kept.brewMethod, "V60 old note", "old brew method kept"); assert.equal(kept.brewRatio, "1:16");
+  await libraryStore().del("oldbrew");
+}
 const adm = (method, body, sale = "") => admin(new Request("http://x/api/admin?sale=" + sale, { method, headers: { "x-admin-password": "test" }, body: body && JSON.stringify(body) }));
 r = await admin(new Request("http://x/api/admin", { method: "POST", body: "{}" })); assert.equal(r.status, 401, "edits need password");
 
@@ -54,20 +63,22 @@ assert.equal(v.library.length, 3, "library pre-loaded with the 3 current coffees
 assert.equal(v.menu.id, "legacy"); assert.equal(v.sales.length, 1);
 
 r = await adm("POST", { action: "coffee.save", name: "El Diviso Geisha", origin: "Colombia", process: "Washed", roast: "Light",
-  taste: "Jasmine", note: "A short note", roastery: "Sey", brewMethod: "SECRET-V60 1:16 93C", costPrice: "2.37", salesPrice: "8", bagGrams: "250", pourGrams: "15", bagPrice: "25", exchangeRate: "0.8137" });
+  taste: "Jasmine", note: "A short note", roastery: "Sey", brewRatio: "1:15.7", brewTemp: "93.7", costPrice: "2.37", salesPrice: "8", bagGrams: "250", pourGrams: "15", bagPrice: "25", exchangeRate: "0.8137" });
 assert.equal(r.status, 200);
 r = await adm("POST", { action: "coffee.save", name: "Bad", costPrice: "abc" }); assert.equal(r.status, 400, "price must be a number");
+r = await adm("POST", { action: "coffee.save", name: "Bad", brewRatio: "strong" }); assert.equal(r.status, 400, "brew ratio must look like 1:15");
+r = await adm("POST", { action: "coffee.save", name: "Bad", brewTemp: "hot" }); assert.equal(r.status, 400, "temperature must be a number");
 r = await adm("POST", { action: "coffee.save", name: "Bad", bagGrams: "lots" }); assert.equal(r.status, 400, "grams must be a number");
 r = await adm("POST", { action: "coffee.save", name: "" }); assert.equal(r.status, 400, "name required");
 v = await (await adm("GET")).json();
 const geisha = v.library.find((c) => c.name === "El Diviso Geisha");
-assert.equal(geisha.brewMethod, "SECRET-V60 1:16 93C", "admin sees brew method");
+assert.equal(geisha.brewRatio, "1:15.7"); assert.equal(geisha.brewTemp, 93.7, "admin sees brew settings");
 assert.equal(geisha.costPrice, 2.37); assert.equal(geisha.salesPrice, 8);
 assert.deepEqual([geisha.bagGrams, geisha.pourGrams, geisha.bagPrice, geisha.exchangeRate], [250, 15, 25, 0.8137], "calculator inputs saved");
 assert.equal(v.library.find((c) => c.id === "kenya").salesPrice, 6, "seeded coffees get their current price as sales price");
 
 const pub = JSON.stringify(await (await coffees()).json()) + JSON.stringify(await (await menu()).json());
-assert.ok(!pub.includes("SECRET-V60"), "brew method never public");
+assert.ok(!pub.includes("1:15.7") && !pub.includes("93.7") && !pub.includes("brewRatio"), "brew settings never public");
 assert.ok(!pub.includes("2.37") && !pub.includes("costPrice"), "cost price never public");
 assert.ok(!pub.includes("0.8137") && !pub.includes("bagGrams"), "calculator inputs never public");
 let cf = (await (await coffees()).json()).coffees;
@@ -82,7 +93,7 @@ r = await adm("POST", sale); assert.equal(r.status, 200);
 v = await (await adm("GET")).json();
 assert.equal(v.sales.length, 2, "legacy kept: it has orders"); assert.equal(v.menu.eventDate, "Sunday 11/10");
 assert.equal(v.orders.length, 0, "new sale starts with no orders");
-assert.equal(v.menu.items[0].brewMethod, undefined, "sale snapshot has no brew method");
+assert.equal(v.menu.items[0].brewRatio, undefined, "sale snapshot has no brew settings");
 assert.equal(v.menu.items[0].costPrice, undefined, "sale snapshot has no cost price");
 assert.equal(v.menu.items[0].bagPrice, undefined, "sale snapshot has no calculator inputs");
 const batch = v.menu.id;

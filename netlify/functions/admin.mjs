@@ -23,14 +23,16 @@ async function act(b) {
   if (b.action === "coffee.save") {
     if (b.id === "_seeded") return "Coffee not found.";
     await getLibrary();
-    if (b.id && !(await library.get(b.id))) return "Coffee not found.";
-    const c = { id: b.id || newId() };
-    for (const f of COFFEE_FIELDS.filter((f) => !NUMBER_FIELDS.includes(f))) c[f] = clean(b[f], f === "note" || f === "brewMethod" ? 600 : 120);
+    const old = b.id ? await library.get(b.id) : null;
+    if (b.id && !old) return "Coffee not found.";
+    const c = { ...old, id: b.id || newId() }; // keeps fields the form doesn't send, e.g. an old brewMethod
+    for (const f of COFFEE_FIELDS.filter((f) => !NUMBER_FIELDS.includes(f))) c[f] = clean(b[f], f === "note" ? 600 : 120);
     for (const f of NUMBER_FIELDS) {
       const v = clean(b[f], 12);
       if (v && !(Number(v) >= 0)) return "Prices, grams and exchange rate must be numbers.";
       c[f] = v === "" ? "" : Number(v);
     }
+    if (c.brewRatio && !/^\d+(\.\d+)?:\d+(\.\d+)?$/.test(c.brewRatio)) return "Brew ratio should look like 1:15.";
     if (!c.name) return "Coffee needs a name.";
     return void (await library.put(c));
   }

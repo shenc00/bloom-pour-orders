@@ -1,7 +1,7 @@
 import { currentSale, getLibrary, pick, PUBLIC_FIELDS } from "./lib/sale.mjs";
 import { json } from "./lib/logic.mjs";
 
-// Public: the whole library, flagged by whether it is on sale now. Brew method is never included.
+// Public: the whole library, flagged by whether it is on sale now. Brew ratio and temperature are never included.
 export default async () => {
   const [library, sale] = await Promise.all([getLibrary(), currentSale()]);
   const on = new Set(sale.items.map((i) => i.id));
