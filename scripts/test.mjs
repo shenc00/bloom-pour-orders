@@ -85,22 +85,25 @@ assert.equal(v.menu.id, "legacy"); assert.equal(v.sales.length, 1);
 }
 
 r = await adm("POST", { action: "coffee.save", name: "El Diviso Geisha", origin: "Colombia", process: "Washed", roast: "Light",
-  taste: "Jasmine", note: "A short note", roastery: "Sey", brewRatio: "1:15.7", brewTemp: "93.7", costPrice: "2.37", salesPrice: "8", bagGrams: "250", pourGrams: "15", bagPrice: "25", exchangeRate: "0.8137" });
+  taste: "Jasmine", note: "A short note", roastery: "Sey", brewRatio: "1:15.7", brewTemp: "93.7", grinder: "RACCEA DF60", grindSize: "70", costPrice: "2.37", salesPrice: "8", bagGrams: "250", pourGrams: "15", bagPrice: "25", exchangeRate: "0.8137" });
 assert.equal(r.status, 200);
 r = await adm("POST", { action: "coffee.save", name: "Bad", costPrice: "abc" }); assert.equal(r.status, 400, "price must be a number");
 r = await adm("POST", { action: "coffee.save", name: "Bad", brewRatio: "strong" }); assert.equal(r.status, 400, "brew ratio must look like 1:15");
 r = await adm("POST", { action: "coffee.save", name: "Bad", brewTemp: "hot" }); assert.equal(r.status, 400, "temperature must be a number");
+r = await adm("POST", { action: "coffee.save", name: "Bad", grindSize: "fine" }); assert.equal(r.status, 400, "grind size must be a number");
 r = await adm("POST", { action: "coffee.save", name: "Bad", bagGrams: "lots" }); assert.equal(r.status, 400, "grams must be a number");
 r = await adm("POST", { action: "coffee.save", name: "" }); assert.equal(r.status, 400, "name required");
 v = await (await adm("GET")).json();
 const geisha = v.library.find((c) => c.name === "El Diviso Geisha");
 assert.equal(geisha.brewRatio, "1:15.7"); assert.equal(geisha.brewTemp, 93.7, "admin sees brew settings");
+assert.equal(geisha.grinder, "RACCEA DF60"); assert.equal(geisha.grindSize, 70, "admin sees grinder settings");
 assert.equal(geisha.costPrice, 2.37); assert.equal(geisha.salesPrice, 8);
 assert.deepEqual([geisha.bagGrams, geisha.pourGrams, geisha.bagPrice, geisha.exchangeRate], [250, 15, 25, 0.8137], "calculator inputs saved");
 assert.equal(v.library.find((c) => c.id === "kenya").salesPrice, 6, "seeded coffees get their current price as sales price");
 
 const pub = JSON.stringify(await (await coffees()).json()) + JSON.stringify(await (await menu()).json());
 assert.ok(!pub.includes("1:15.7") && !pub.includes("93.7") && !pub.includes("brewRatio"), "brew settings never public");
+assert.ok(!pub.includes("RACCEA") && !pub.includes("grindSize") && !pub.includes("grinder"), "grinder settings never public");
 assert.ok(!pub.includes("2.37") && !pub.includes("costPrice"), "cost price never public");
 assert.ok(!pub.includes("0.8137") && !pub.includes("bagGrams"), "calculator inputs never public");
 let cf = (await (await coffees()).json()).coffees;
@@ -116,6 +119,7 @@ v = await (await adm("GET")).json();
 assert.equal(v.sales.length, 2, "legacy kept: it has orders"); assert.equal(v.menu.eventDate, "Sunday 11/10");
 assert.equal(v.orders.length, 0, "new sale starts with no orders");
 assert.equal(v.menu.items[0].brewRatio, undefined, "sale snapshot has no brew settings");
+assert.equal(v.menu.items[0].grinder, undefined, "sale snapshot has no grinder settings");
 assert.equal(v.menu.items[0].costPrice, undefined, "sale snapshot has no cost price");
 assert.equal(v.menu.items[0].bagPrice, undefined, "sale snapshot has no calculator inputs");
 const batch = v.menu.id;

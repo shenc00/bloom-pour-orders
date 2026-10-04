@@ -4,11 +4,11 @@ import { fullName } from "./logic.mjs";
 
 // Library coffees have these fields. Only PUBLIC_FIELDS are copied into a sale or sent to customers;
 // everything else is private to admin. salesPrice is the default price when you set up a sale.
-// brewRatio and brewTemp are the private brew settings; the four after salesPrice are the cost calculator's saved inputs.
+// brewRatio, brewTemp, grinder and grindSize are the private brew settings; the four after salesPrice are the cost calculator's saved inputs.
 // An older free-text `brewMethod` may still sit on a record: it is kept as is, never edited or shown to customers.
 export const PUBLIC_FIELDS = ["name", "origin", "process", "taste", "roast", "note", "roastery"];
-export const NUMBER_FIELDS = ["costPrice", "salesPrice", "bagGrams", "pourGrams", "bagPrice", "exchangeRate", "brewTemp"];
-export const COFFEE_FIELDS = [...PUBLIC_FIELDS, "brewRatio", ...NUMBER_FIELDS];
+export const NUMBER_FIELDS = ["costPrice", "salesPrice", "bagGrams", "pourGrams", "bagPrice", "exchangeRate", "brewTemp", "grindSize"];
+export const COFFEE_FIELDS = [...PUBLIC_FIELDS, "brewRatio", "grinder", ...NUMBER_FIELDS];
 export const pick = (o, keys) => Object.fromEntries(keys.map((k) => [k, o[k] ?? ""]));
 
 // Sales carry a private `costs` map (coffee id -> cost per cup, null if unknown) for profit figures.

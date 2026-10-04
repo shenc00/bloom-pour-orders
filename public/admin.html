@@ -105,7 +105,7 @@ function drawOrders(){
 }
 
 const FIELDS=[['name','Name (e.g. El Diviso Geisha)'],['origin','Origin (e.g. Colombia)'],['process','Process (e.g. Washed)'],['roast','Roast (e.g. Light)'],['taste','Taste profile'],['roastery','Roastery'],['note','Short note','t']];
-const BREW=[['brewRatio','Brew ratio (private, only you see this)','1:15','text'],['brewTemp','Brew temperature, °C (private, only you see this)',95,'number']];
+const BREW=[['brewRatio','Brew ratio (private, only you see this)','1:15','text'],['brewTemp','Brew temperature, °C (private, only you see this)',95,'number'],['grinder','Grinder (private, only you see this)','RACCEA DF60','text'],['grindSize','Grind size (private, only you see this)',70,'number']];
 const CALC=[['bagGrams','Grams in a bag',100],['pourGrams','Grams per pour',15],['bagPrice','Price of the bag (in the currency you paid)',''],['exchangeRate','Exchange rate (that currency per S$1; use 1 if you paid in SGD)',1]];
 const num=k=>parseFloat($('#cf_'+k).value);
 const numField=(k,l,v)=>[el('label',{textContent:l,htmlFor:'cf_'+k}),el('input',{id:'cf_'+k,type:'number',min:0,step:'any',value:v??'',style:'max-width:220px'})];
@@ -124,7 +124,7 @@ function drawLibrary(){
     data.library.length?'':'No coffees yet.');
   $('#cfTitle').textContent=editing?`Edit ${full(editing)}`:'Add a coffee';
   const f=$('#cf');f.replaceChildren(...FIELDS.flatMap(([k,l,t])=>[el('label',{textContent:l}),el(t==='t'?'textarea':'input',{id:'cf_'+k,rows:2,value:editing?.[k]??'',maxLength:t==='t'?600:120})]),
-    ...BREW.flatMap(([k,l,d,type])=>[el('label',{textContent:l,htmlFor:'cf_'+k}),el('input',{id:'cf_'+k,type,...(type==='number'?{min:0,step:'any'}:{maxLength:20}),value:editing?.[k]||d,style:'max-width:220px'})]),
+    ...BREW.flatMap(([k,l,d,type])=>[el('label',{textContent:l,htmlFor:'cf_'+k}),el('input',{id:'cf_'+k,type,...(type==='number'?{min:0,step:'any'}:{maxLength:40}),value:editing?.[k]||d,style:'max-width:220px'})]),
     editing?.brewMethod?el('div',{className:'hint',textContent:`Old brew method note (kept): ${editing.brewMethod}`}):'',
     el('div',{className:'qrbox'},el('b',{textContent:'Cost calculator'}),...CALC.flatMap(([k,l,d])=>numField(k,l,editing?.[k]||d)),el('div',{id:'calcOut',className:'hint',style:'margin-top:10px'})),
     ...numField('costPrice','Cost price per pour, $ (private, only you see this)',editing?.costPrice),el('div',{className:'hint',textContent:'Calculated. Overwrite if necessary.'}),
