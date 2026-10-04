@@ -4,6 +4,7 @@ import menu from "../netlify/functions/menu.mjs";
 import order from "../netlify/functions/order.mjs";
 import admin from "../netlify/functions/admin.mjs";
 import coffees from "../netlify/functions/coffees.mjs";
+import qr from "../netlify/functions/qr.mjs";
 
 await fs.rm(".data", { recursive: true, force: true });
 const post = (b) => order(new Request("http://x/api/order", { method: "POST", body: JSON.stringify(b) }));
@@ -80,5 +81,19 @@ assert.equal(v.menu.id, batch); assert.equal(v.menu.hours, "10am – 2pm"); asse
 r = await adm("POST", { action: "coffee.delete", id: geisha.id }); assert.equal(r.status, 200);
 v = await (await adm("GET")).json(); assert.equal(v.library.length, 3);
 assert.equal(v.menu.items[0].name, "El Diviso Geisha", "deleting from library leaves the sale intact");
+
+// ---- PayNow QR ----
+v = await (await adm("GET")).json();
+assert.deepEqual(v.qr, { expiry: "2026-10-05", custom: false, updatedAt: null }, "default QR info");
+r = await qr(new Request("http://x/api/qr")); assert.equal(r.status, 302); assert.equal(new URL(r.headers.get("location")).pathname, "/paynow-qr.png");
+const PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
+r = await adm("POST", { action: "qr.save", expiry: "soon", image: PNG }); assert.equal(r.status, 400, "bad date");
+r = await adm("POST", { action: "qr.save", expiry: "2026-12-31", image: "data:text/html;base64,PHNjcmlwdD4=" }); assert.equal(r.status, 400, "non-image rejected");
+r = await adm("POST", { action: "qr.save", expiry: "2026-12-31", image: PNG }); assert.equal(r.status, 200);
+r = await qr(new Request("http://x/api/qr")); assert.equal(r.status, 200); assert.equal(r.headers.get("content-type"), "image/png");
+assert.equal(Buffer.from(await r.arrayBuffer()).toString("base64"), PNG.split(",")[1], "served image matches upload");
+r = await adm("POST", { action: "qr.save", expiry: "2027-01-31" }); assert.equal(r.status, 200, "date-only update");
+v = await (await adm("GET")).json(); assert.equal(v.qr.expiry, "2027-01-31"); assert.ok(v.qr.custom, "image kept on date-only update");
+assert.ok(!JSON.stringify(v).includes("base64"), "admin view does not ship the image");
 
 console.log("all tests passed; kenya left:", m.remaining.kenya);

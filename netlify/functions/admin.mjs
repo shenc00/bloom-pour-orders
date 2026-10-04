@@ -1,5 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
-import { ordersStore, libraryStore, salesStore } from "./lib/store.mjs";
+import { ordersStore, libraryStore, salesStore, settingsStore } from "./lib/store.mjs";
+import { qrInfo } from "./lib/qr.mjs";
 import { remainingStock, byCreated, inSale, fullName, json } from "./lib/logic.mjs";
 import { listSales, getLibrary, pick, COFFEE_FIELDS, PUBLIC_FIELDS } from "./lib/sale.mjs";
 import { MENU } from "./lib/menu.mjs";
@@ -55,6 +56,17 @@ async function act(b) {
     } else Object.assign(sale, { id: newId(), publishedAt: Date.now() });
     return void (await sales.put(sale));
   }
+  if (b.action === "qr.save") {
+    const settings = settingsStore(), old = await settings.get("qr");
+    const expiry = clean(b.expiry, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(expiry) || isNaN(Date.parse(expiry))) return "Enter the date the QR expires.";
+    let image = old?.image ?? ""; // no new image: keep the current one and only change the date
+    if (b.image) {
+      if (String(b.image).length > 1_500_000 || !/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/]+=*$/.test(b.image)) return "Please upload a PNG, JPG or WebP image under 1MB.";
+      image = b.image;
+    }
+    return void (await settings.put({ id: "qr", image, expiry, updatedAt: Date.now() }));
+  }
   return "Unknown action.";
 }
 
@@ -84,6 +96,6 @@ export default async (req) => {
   const sales = await listSales(all);
   const menu = sales.find((s) => s.id === new URL(req.url).searchParams.get("sale")) ?? sales[0];
   const orders = all.filter((o) => inSale(o, menu)).sort(byCreated);
-  return json({ menu, sales, orders, remaining: remainingStock(all, menu), library: await getLibrary() });
+  return json({ menu, sales, orders, remaining: remainingStock(all, menu), library: await getLibrary(), qr: await qrInfo() });
 };
 export const config = { path: "/api/admin" };

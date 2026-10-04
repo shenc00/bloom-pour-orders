@@ -8,6 +8,7 @@ Mobile-friendly order page for Bloom Pour pour-over coffee, built for Netlify.
   - **Orders**: per sale (current and past), totals per coffee, paid / collected ticks, cancel, CSV download.
   - **Coffee library**: add, edit and delete coffees, including a private brew method field.
   - **Sale setup**: date, hours, time windows, and which library coffees are on sale with price and cups. *Publish as new sale* starts fresh stock and orders; *Update current sale* edits the live one.
+  - **PayNow QR**: upload a new QR image and set its expiry date. A warning banner shows in admin for the last 7 days and after expiry.
 - Stock limits are per sale and enforced on the server, so two people can't take the last cup.
 - Orders are stored in Netlify Blobs. No database or Google account needed.
 
@@ -20,7 +21,7 @@ Mobile-friendly order page for Bloom Pour pour-over coffee, built for Netlify.
 ## Editing
 - Each sale (date, hours, coffees, prices, cups, time windows): `/admin` → Sale setup. No redeploy needed.
 - Fixed settings (contact number, estate, free-delivery rule) and the fallback menu used before the first sale is published: `netlify/functions/lib/menu.mjs`. The coffee library is pre-loaded once from this file.
-- PayNow QR: replace `public/paynow-qr.png`. **The current QR expires 5 Oct 2026.**
+- PayNow QR: change it in `/admin` → PayNow QR (no redeploy). `public/paynow-qr.png` is only the fallback until you upload one; its expiry (5 Oct 2026) is `qrExpiry` in `menu.mjs`.
 - Look and feel: the `<style>` block in `public/index.html`.
 - Orders from earlier sales are kept (Blobs stores `orders`, `library`, `sales`). Publishing a new sale resets stock automatically; nothing needs deleting.
 

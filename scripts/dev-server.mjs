@@ -5,7 +5,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 const routes = {};
-for (const f of ["menu", "order", "admin", "cancel", "coffees"]) {
+for (const f of ["menu", "order", "admin", "cancel", "coffees", "qr"]) {
   const m = await import(`../netlify/functions/${f}.mjs`);
   routes[m.config.path] = m.default;
 }

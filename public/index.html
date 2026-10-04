@@ -203,7 +203,7 @@ function done(o) {
     el('p', {textContent: `${o.method === 'delivery' ? 'Delivery' : 'Collection'} · ${o.slot}`}),
     el('div', {className: 'total', style: 'justify-content:center;gap:12px'}, el('span', {textContent: 'Amount to pay:'}), el('span', {textContent: `$${o.total}`})),
     el('p', {textContent: 'Please pay via PayNow and add your name as the reference.'}),
-    el('img', {src: '/paynow-qr.png', alt: 'PayNow QR code'}),
+    el('img', {src: '/api/qr', alt: 'PayNow QR code'}),
     el('p', {}, waLink(o, lines)),
     el('button', {type: 'button', className: 'back', textContent: 'Edit / cancel my order', onclick: () => editOrder(o)}),
     el('p', {className: 'hint', textContent: 'Editing cancels this order and releases your cups until you place a new one.'}),

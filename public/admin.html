@@ -19,12 +19,15 @@ td button{padding:4px 8px;font-size:13px}
 .card{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:12px 14px;margin:8px 0;display:flex;justify-content:space-between;gap:10px;align-items:center}
 .card small{display:block}.pick{display:grid;grid-template-columns:auto 1fr 90px 90px;gap:8px;align-items:center;margin:6px 0}
 .pick input[type=checkbox]{width:20px;height:20px}.pick input[type=number]{width:100%}
-.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}[hidden]{display:none!important}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.warn{border:2px solid #c0392b;color:#c0392b;background:#fff;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-weight:bold}
+.qrbox{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:14px;margin:8px 0}.qrbox img{width:200px;max-width:100%;background:#fff;border-radius:10px;padding:6px;display:block;margin-top:10px}[hidden]{display:none!important}
 </style></head><body><main>
 <h1>Bloom Pour – Admin</h1>
 <div id="login"><input id="pw" type="password" placeholder="Admin password" style="max-width:300px"> <button id="in">Log in</button><div class="err" id="err"></div></div>
 <div id="dash" hidden>
-  <div class="tabs"><button data-t="orders">Orders</button><button data-t="library">Coffee library</button><button data-t="sale">Sale setup</button></div>
+  <div class="tabs"><button data-t="orders">Orders</button><button data-t="library">Coffee library</button><button data-t="sale">Sale setup</button><button data-t="qr">PayNow QR</button></div>
+  <div id="qrWarn" class="warn" hidden></div>
   <div id="msg"></div>
 
   <section id="t-orders">
@@ -43,6 +46,18 @@ td button{padding:4px 8px;font-size:13px}
     <h2>Set up a sale</h2>
     <div class="hint">Pick coffees from your library. “Publish as new sale” starts fresh stock and a fresh orders list; old sales stay under Orders. “Update current sale” changes the live sale without resetting orders.</div>
     <form id="sf"></form>
+  </section>
+
+  <section id="t-qr" hidden>
+    <h2>PayNow QR</h2>
+    <div class="qrbox"><b id="qrNote"></b><div id="qrWhen"></div><img id="qrImg" alt="Current PayNow QR"></div>
+    <h2>Replace the QR</h2>
+    <form id="qf">
+      <label for="qr_file">New QR image (PNG, JPG or WebP)</label><input type="file" id="qr_file" accept="image/png,image/jpeg,image/webp">
+      <label for="qr_exp">Expiry date of the QR</label><input type="date" id="qr_exp" required style="max-width:220px">
+      <div class="hint">Customers see the new QR straight away. Leave the image empty to only change the expiry date.</div>
+      <div class="row"><button type="submit">Save QR</button></div>
+    </form>
   </section>
 </div>
 <script>
@@ -97,10 +112,27 @@ function drawSale(){
   f.onsubmit=e=>{e.preventDefault();if(confirm('Publish a new sale? The main page switches to it straight away and stock starts fresh.'))save()};
 }
 
+// ---- PayNow QR ----
+const daysLeft=d=>Math.ceil((new Date(d+'T23:59:59+08:00')-Date.now())/864e5);
+const nice=d=>new Date(d+'T12:00:00+08:00').toLocaleDateString('en-SG',{timeZone:'Asia/Singapore',weekday:'short',day:'numeric',month:'short',year:'numeric'});
+function qrStatus(){const n=daysLeft(data.qr.expiry),d=nice(data.qr.expiry);
+  return {n,text:n<0?`PayNow QR expired on ${d}. Customers cannot pay with it. Upload a new one now.`:n===0?`PayNow QR expires today (${d}). Upload a new one.`:`PayNow QR expires ${d} (${n} day${n>1?'s':''} left).`}}
+function drawQr(){
+  const q=qrStatus();$('#qrNote').textContent=q.text;$('#qrNote').style.color=q.n<=7?'#c0392b':'var(--ink)';
+  $('#qrWhen').textContent=data.qr.custom?'This is the QR you uploaded here.':'This is the QR that came with the site. Upload a new one before it expires.';
+  $('#qrImg').src='/api/qr?'+(data.qr.updatedAt||0);$('#qr_exp').value=data.qr.expiry;$('#qr_file').value='';
+  $('#qf').onsubmit=async e=>{e.preventDefault();try{const f=$('#qr_file').files[0];act({action:'qr.save',expiry:$('#qr_exp').value,image:f?await toDataUrl(f):''},f?'QR saved. Customers see it now.':'Expiry date saved.')}catch(x){say(x.message,true)}};
+}
+// Shrink big screenshots so the upload stays small; a QR stays scannable at 700px.
+function toDataUrl(file){return new Promise((ok,no)=>{const r=new FileReader();r.onerror=()=>no(new Error('Could not read that file.'));r.onload=()=>{const img=new Image();img.onerror=()=>no(new Error('That file is not a usable image.'));img.onload=()=>{
+  const k=Math.min(1,700/Math.max(img.width,img.height));if(k===1&&r.result.length<1e6)return ok(r.result);
+  const c=el('canvas',{width:Math.round(img.width*k),height:Math.round(img.height*k)});const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);ok(c.toDataURL('image/png'))};img.src=r.result};r.readAsDataURL(file)})}
+
 function draw(){
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
-  ['orders','library','sale'].forEach(t=>$('#t-'+t).hidden=t!==tab);
-  ({orders:drawOrders,library:drawLibrary,sale:drawSale})[tab]();
+  ['orders','library','sale','qr'].forEach(t=>$('#t-'+t).hidden=t!==tab);
+  const q=qrStatus();$('#qrWarn').hidden=q.n>7||tab==='qr';$('#qrWarn').textContent=q.text;
+  ({orders:drawOrders,library:drawLibrary,sale:drawSale,qr:drawQr})[tab]();
 }
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;$('#msg').replaceChildren();draw()});
 $('#salePick').onchange=e=>{sel=e.target.value;show()};

@@ -10,6 +10,7 @@ export const MENU = {
   collectionPoint: "Blk 6 basement / level 1 lobby",
   estate: "Ki Residences",
   freeDeliveryMinCups: 4,
+  qrExpiry: "2026-10-05", // expiry of public/paynow-qr.png; update it in /admin when you upload a new QR
   notes: [
     "Light and medium-light roasts, fruity and citrusy",
     "All coffees are served hot, brewed with 15g of coffee per cup",

@@ -9,6 +9,7 @@ const makeStore = (name) => (process.env.LOCAL_STORE === "1" ? localStore(name) 
 export const ordersStore = () => makeStore("orders");
 export const libraryStore = () => makeStore("library");
 export const salesStore = () => makeStore("sales");
+export const settingsStore = () => makeStore("settings");
 
 function blobStore(name) {
   let s;
