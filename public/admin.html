@@ -19,6 +19,7 @@ td button{padding:4px 8px;font-size:13px}
 .card{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:12px 14px;margin:8px 0;display:flex;justify-content:space-between;gap:10px;align-items:center}
 .card small{display:block}.pick{display:grid;grid-template-columns:auto 1fr 90px 90px;gap:8px;align-items:center;margin:6px 0}
 .pick input[type=checkbox]{width:20px;height:20px}.pick input[type=number]{width:100%}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}.chips button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .split{display:flex;height:26px;border-radius:8px;overflow:hidden;border:2px solid var(--accent);background:var(--card)}.split .c{background:var(--grey)}.split .p{background:var(--accent);border-left:2px solid var(--ink)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin:8px 0;font-size:14px}.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
@@ -104,7 +105,16 @@ function drawOrders(){
     tr.append(cell(t),cell(o.name),cell(o.phone),cell(order),cell('$'+o.total),cell(promo),cell(money(f.net(o))),cell(o.method),cell(o.slot),cell([o.address,o.notes].filter(Boolean).join(' · ')),cell(paid),cell(done),cell(btn(o.cancelled?'Restore':'Cancel',()=>patch({id:o.id,cancelled:!o.cancelled}))));return tr}));
 }
 
-const FIELDS=[['name','Name (e.g. El Diviso Geisha)'],['origin','Origin (e.g. Colombia)'],['process','Process (e.g. Washed)'],['roast','Roast (e.g. Light)'],['taste','Taste profile'],['roastery','Roastery'],['note','Short note','t']];
+const FIELDS=[['name','Name (e.g. El Diviso Geisha)'],['origin','Origin'],['process','Process'],['roast','Roast'],['taste','Taste profile'],['roastery','Roastery'],['note','Short note','t']];
+const OPTS={origin:['Colombia','Ethiopia','Peru','Panama'],process:['Washed','Natural','Anaerobic','Honey'],roast:['Light','Medium-light','Medium'],roastery:['Blaq','Abseil','Sweet Blossom','Nonagon Roastery']};
+// Click-to-pick buttons; "Others" reveals a text box. The input #cf_<k> always holds the value that gets saved.
+function picker(k,val){
+  const input=el('input',{id:'cf_'+k,value:val,maxLength:120,placeholder:'Type it in'});
+  let other=val!==''&&!OPTS[k].includes(val);
+  const chips=[...OPTS[k],'Others'].map(o=>btn(o,()=>{if(o==='Others'){if(!other&&OPTS[k].includes(input.value))input.value='';other=true;sync();input.focus()}else{other=false;input.value=o;sync()}},'alt'));
+  const sync=()=>{chips.forEach(b=>b.classList.toggle('on',b.textContent==='Others'?other:!other&&input.value===b.textContent));input.style.display=other?'':'none'};
+  sync();return el('div',{},el('div',{className:'chips'},chips),input);
+}
 const BREW=[['brewRatio','Brew ratio (private, only you see this)','1:15','text'],['brewTemp','Brew temperature, °C (private, only you see this)',95,'number'],['grinder','Grinder (private, only you see this)','RACCEA DF60','text'],['grindSize','Grind size (private, only you see this)',70,'number']];
 const CALC=[['bagGrams','Grams in a bag',100],['pourGrams','Grams per pour',15],['bagPrice','Price of the bag (in the currency you paid)',''],['exchangeRate','Exchange rate (that currency per S$1; use 1 if you paid in SGD)',1]];
 const num=k=>parseFloat($('#cf_'+k).value);
@@ -123,7 +133,7 @@ function drawLibrary(){
   $('#lib').replaceChildren(...data.library.map(c=>el('div',{className:'card'},el('span',{},el('b',{textContent:full(c)}),el('small',{textContent:[c.process,c.roast,c.roastery,c.salesPrice!==''&&c.salesPrice!=null?`sells $${c.salesPrice}`:'',c.costPrice!==''&&c.costPrice!=null?`cost $${c.costPrice}`:''].filter(Boolean).join(' · ')})),btn('Edit',()=>{editing=c;drawLibrary();window.scrollTo(0,document.body.scrollHeight)}))),
     data.library.length?'':'No coffees yet.');
   $('#cfTitle').textContent=editing?`Edit ${full(editing)}`:'Add a coffee';
-  const f=$('#cf');f.replaceChildren(...FIELDS.flatMap(([k,l,t])=>[el('label',{textContent:l}),el(t==='t'?'textarea':'input',{id:'cf_'+k,rows:2,value:editing?.[k]??'',maxLength:t==='t'?600:120})]),
+  const f=$('#cf');f.replaceChildren(...FIELDS.flatMap(([k,l,t])=>[el('label',{textContent:l}),OPTS[k]?picker(k,editing?.[k]??''):el(t==='t'?'textarea':'input',{id:'cf_'+k,rows:2,value:editing?.[k]??'',maxLength:t==='t'?600:120})]),
     ...BREW.flatMap(([k,l,d,type])=>[el('label',{textContent:l,htmlFor:'cf_'+k}),el('input',{id:'cf_'+k,type,...(type==='number'?{min:0,step:'any'}:{maxLength:40}),value:editing?.[k]||d,style:'max-width:220px'})]),
     editing?.brewMethod?el('div',{className:'hint',textContent:`Old brew method note (kept): ${editing.brewMethod}`}):'',
     el('div',{className:'qrbox'},el('b',{textContent:'Cost calculator'}),...CALC.flatMap(([k,l,d])=>numField(k,l,editing?.[k]||d)),el('div',{id:'calcOut',className:'hint',style:'margin-top:10px'})),
