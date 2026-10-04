@@ -78,6 +78,17 @@ r = await post({ ...base, slot: "10am – 12pm", items: { kenya: 1 } }); assert.
 v = await (await adm("GET", null, "legacy")).json();
 assert.ok(v.orders.length >= 3 && v.orders.every((o) => (o.batch ?? "legacy") === "legacy"), "past sale orders still viewable");
 v = await (await adm("GET", null, batch)).json(); assert.equal(v.orders.length, 1);
+assert.deepEqual(v.costs, { [geisha.id]: 2.37, kenya: null }, "sale keeps cost prices; unknown cost is null");
+const pubMenu = JSON.stringify(await (await menu()).json());
+assert.ok(!pubMenu.includes("costs") && !pubMenu.includes("2.37"), "cost never in public menu");
+const oid = v.orders[0].id, patch = (b) => adm("PATCH", { id: oid, ...b }, batch);
+r = await patch({ discount: 1.5 }); assert.equal(r.status, 200);
+assert.equal((await r.json()).orders[0].discount, 1.5, "promo saved on order");
+r = await patch({ discount: 999 }); assert.equal(r.status, 400, "promo above order total rejected");
+r = await patch({ discount: -1 }); assert.equal(r.status, 400, "negative promo rejected");
+r = await patch({ discount: "abc" }); assert.equal(r.status, 400, "non-numeric promo rejected");
+r = await patch({ discount: 0 }); assert.equal((await r.json()).orders[0].discount, 0, "promo can be cleared");
+await patch({ discount: 2 });
 
 r = await adm("POST", { ...sale, batch, hours: "10am – 2pm", items: [{ id: geisha.id, price: 8, cap: 4 }, { id: "kenya", price: 6, cap: 5 }] });
 assert.equal(r.status, 200); v = await (await adm("GET")).json();

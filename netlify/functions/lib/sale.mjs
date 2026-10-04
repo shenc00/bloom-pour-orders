@@ -9,6 +9,13 @@ export const PRICE_FIELDS = ["costPrice", "salesPrice"];
 export const COFFEE_FIELDS = [...PUBLIC_FIELDS, "brewMethod", ...PRICE_FIELDS];
 export const pick = (o, keys) => Object.fromEntries(keys.map((k) => [k, o[k] ?? ""]));
 
+// Sales carry a private `costs` map (coffee id -> cost per cup, null if unknown) for profit figures.
+export const publicSale = ({ costs, ...sale }) => sale;
+// The legacy sale predates stored costs, so it uses the library's current cost prices.
+export const saleCosts = (sale, library) =>
+  sale.costs ?? Object.fromEntries(sale.items.map((i) => [i.id, costOf(library.find((c) => c.id === i.id))]));
+export const costOf = (c) => (c && c.costPrice !== "" && c.costPrice != null ? Number(c.costPrice) : null);
+
 const legacy = () => ({ ...MENU, id: "legacy", publishedAt: 0 });
 
 // Newest first. Stored sales override the defaults in menu.mjs. The pre-sales "legacy" sale

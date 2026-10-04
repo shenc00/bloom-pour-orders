@@ -20,6 +20,8 @@ td button{padding:4px 8px;font-size:13px}
 .card small{display:block}.pick{display:grid;grid-template-columns:auto 1fr 90px 90px;gap:8px;align-items:center;margin:6px 0}
 .pick input[type=checkbox]{width:20px;height:20px}.pick input[type=number]{width:100%}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.split{display:flex;height:26px;border-radius:8px;overflow:hidden;border:2px solid var(--accent);background:var(--card)}.split .c{background:var(--grey)}.split .p{background:var(--accent);border-left:2px solid var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin:8px 0;font-size:14px}.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 .warn{border:2px solid #c0392b;color:#c0392b;background:#fff;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-weight:bold}
 .qrbox{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:14px;margin:8px 0}.qrbox img{width:200px;max-width:100%;background:#fff;border-radius:10px;padding:6px;display:block;margin-top:10px}[hidden]{display:none!important}
 </style></head><body><main>
@@ -33,8 +35,9 @@ td button{padding:4px 8px;font-size:13px}
   <section id="t-orders">
     <label for="salePick">Sale</label><select id="salePick"></select>
     <div class="sum" id="sum"></div>
+    <h2>Revenue split</h2><div id="split"></div>
     <button id="csv">Download CSV</button> <button id="refresh" class="alt">Refresh</button>
-    <div class="wrap"><table><thead><tr><th>Time</th><th>Name</th><th>Phone</th><th>Order</th><th>$</th><th>Method</th><th>Window</th><th>Address / notes</th><th>Paid</th><th>Done</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+    <div class="wrap"><table><thead><tr><th>Time</th><th>Name</th><th>Phone</th><th>Order</th><th>$</th><th>Promo $</th><th>Net $</th><th>Method</th><th>Window</th><th>Address / notes</th><th>Paid</th><th>Done</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
   </section>
 
   <section id="t-library" hidden>
@@ -70,17 +73,33 @@ function cell(t,c){const td=document.createElement('td');if(c)td.className=c;td.
 function btn(label,fn,cls=''){const b=el('button',{type:'button',textContent:label,className:cls});b.onclick=fn;return b}
 async function act(body,done){try{data=await call('POST',body);draw();say(done)}catch(e){say(e.message,true)}}
 
+const money=n=>'$'+(Math.round(n*100)/100).toFixed(2).replace(/\.00$/,'');
+// Revenue is order total minus promo. Cost uses each coffee's cost price saved with the sale.
+function figures(){const {menu,orders,costs}=data;const live=orders.filter(o=>!o.cancelled);
+  const cost=o=>menu.items.reduce((t,i)=>t+(o.items[i.id]||0)*(costs[i.id]||0),0),net=o=>o.total-(o.discount||0);
+  const rev=live.reduce((t,o)=>t+net(o),0),cogs=live.reduce((t,o)=>t+cost(o),0);
+  return {live,cost,net,rev,cogs,profit:rev-cogs,paid:live.filter(o=>o.paid).reduce((t,o)=>t+net(o),0),promo:live.reduce((t,o)=>t+(o.discount||0),0),
+    missing:menu.items.filter(i=>costs[i.id]==null&&live.some(o=>o.items[i.id]))}}
+function drawSplit(f){
+  const cp=f.rev>0?Math.min(100,f.cogs/f.rev*100):0,pp=f.rev>0?100-cp:0,margin=f.rev>0?Math.round(f.profit/f.rev*100):0;
+  $('#split').replaceChildren(
+    el('div',{className:'split',role:'img',ariaLabel:`Of ${money(f.rev)} revenue, ${money(f.cogs)} is coffee cost and ${money(f.profit)} is gross profit`},el('span',{className:'c',style:`width:${cp}%`}),el('span',{className:'p',style:`width:${pp}%`})),
+    el('div',{className:'legend'},el('span',{},el('i',{style:'background:var(--grey)'}),`Coffee cost ${money(f.cogs)}`),el('span',{},el('i',{style:'background:var(--accent)'}),`Gross profit ${money(f.profit)} (${margin}% margin)`),el('span',{textContent:`of ${money(f.rev)} revenue after ${money(f.promo)} promos`})),
+    f.missing.length?el('div',{className:'err',textContent:`No cost price for ${f.missing.map(full).join(', ')}. Add it in Coffee library, then Update current sale; until then profit is overstated.`}):'')}
 function drawOrders(){
-  const {menu,orders,sales}=data;const live=orders.filter(o=>!o.cancelled);
+  const {menu,orders,sales}=data;const f=figures(),live=f.live;
   $('#salePick').replaceChildren(...sales.map((s,i)=>el('option',{value:s.id,textContent:`${s.eventDate}${i?'':' (current)'}`,selected:s.id===menu.id})));
   $('#sum').replaceChildren(...menu.items.map(i=>{const sold=live.reduce((s,o)=>s+(o.items[i.id]||0),0);return el('div',{className:'chip'},el('b',{textContent:`${sold}/${i.cap}`}),el('span',{textContent:full(i)}))}),
-    el('div',{className:'chip'},el('b',{textContent:`$${live.filter(o=>o.paid).reduce((s,o)=>s+o.total,0)} / $${live.reduce((s,o)=>s+o.total,0)}`}),el('span',{textContent:'Revenue (paid / total)'})));
+    el('div',{className:'chip'},el('b',{textContent:money(f.rev)}),el('span',{textContent:`Revenue after promos (paid ${money(f.paid)})`})),
+    el('div',{className:'chip'},el('b',{textContent:money(f.profit)}),el('span',{textContent:'Gross profit'})));
+  drawSplit(f);
   $('#rows').replaceChildren(...orders.map(o=>{const tr=document.createElement('tr');if(o.cancelled)tr.className='x';
     const order=menu.items.filter(i=>o.items[i.id]).map(i=>`${o.items[i.id]}× ${full(i)}`).join(', ');
     const t=new Date(o.createdAt).toLocaleString('en-SG',{timeZone:'Asia/Singapore',dateStyle:'short',timeStyle:'short'});
     const paid=el('input',{type:'checkbox',checked:o.paid,onchange:()=>patch({id:o.id,paid:paid.checked})});
     const done=el('input',{type:'checkbox',checked:o.collected,onchange:()=>patch({id:o.id,collected:done.checked})});
-    tr.append(cell(t),cell(o.name),cell(o.phone),cell(order),cell('$'+o.total),cell(o.method),cell(o.slot),cell([o.address,o.notes].filter(Boolean).join(' · ')),cell(paid),cell(done),cell(btn(o.cancelled?'Restore':'Cancel',()=>patch({id:o.id,cancelled:!o.cancelled}))));return tr}));
+    const promo=el('input',{type:'number',min:0,max:o.total,step:'0.01',value:o.discount||'',placeholder:'0',ariaLabel:`Promo for ${o.name}`,style:'width:84px;padding:4px 6px',onchange:()=>patch({id:o.id,discount:promo.value===''?0:promo.value})});
+    tr.append(cell(t),cell(o.name),cell(o.phone),cell(order),cell('$'+o.total),cell(promo),cell(money(f.net(o))),cell(o.method),cell(o.slot),cell([o.address,o.notes].filter(Boolean).join(' · ')),cell(paid),cell(done),cell(btn(o.cancelled?'Restore':'Cancel',()=>patch({id:o.id,cancelled:!o.cancelled}))));return tr}));
 }
 
 const FIELDS=[['name','Name (e.g. El Diviso Geisha)'],['origin','Origin (e.g. Colombia)'],['process','Process (e.g. Washed)'],['roast','Roast (e.g. Light)'],['taste','Taste profile'],['roastery','Roastery'],['note','Short note','t'],['brewMethod','Brew method (private, only you see this)','t'],['costPrice','Cost price per cup, $ (private, only you see this)','n'],['salesPrice','Sales price per cup, $ (used in Sale setup and on the main page)','n']];
@@ -136,12 +155,13 @@ function draw(){
 }
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;$('#msg').replaceChildren();draw()});
 $('#salePick').onchange=e=>{sel=e.target.value;show()};
-async function patch(b){try{data=await call('PATCH',b);draw()}catch(e){alert(e.message)}}
+async function patch(b){try{data=await call('PATCH',b);draw()}catch(e){alert(e.message);draw()}}
 async function show(){try{data=await call();sessionStorage.setItem('pw',pw);$('#login').hidden=true;$('#dash').hidden=false;draw()}catch(e){$('#err').textContent=e.message}}
 $('#in').onclick=()=>{pw=$('#pw').value;show()};$('#pw').onkeydown=e=>{if(e.key==='Enter')$('#in').click()};$('#refresh').onclick=show;
 $('#csv').onclick=()=>{const {menu,orders}=data;const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const head=['Time','Name','Phone',...menu.items.map(full),'Total','Method','Window','Address','Notes','Paid','Collected','Cancelled'];
-  const rows=orders.map(o=>[new Date(o.createdAt).toISOString(),o.name,o.phone,...menu.items.map(i=>o.items[i.id]||0),o.total,o.method,o.slot,o.address,o.notes,o.paid,o.collected,o.cancelled]);
+  const head=['Time','Name','Phone',...menu.items.map(full),'Total','Promo','Net revenue','Cost','Gross profit','Method','Window','Address','Notes','Paid','Collected','Cancelled'];
+  const f=figures();
+  const rows=orders.map(o=>[new Date(o.createdAt).toISOString(),o.name,o.phone,...menu.items.map(i=>o.items[i.id]||0),o.total,o.discount||0,f.net(o),f.cost(o),f.net(o)-f.cost(o),o.method,o.slot,o.address,o.notes,o.paid,o.collected,o.cancelled]);
   const blob=new Blob([[head,...rows].map(r=>r.map(q).join(',')).join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`bloom-pour-orders-${menu.id}.csv`;a.click()};
 if(pw)show();
 </script></main></body></html>
