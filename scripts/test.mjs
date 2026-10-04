@@ -5,6 +5,21 @@ import order from "../netlify/functions/order.mjs";
 import admin from "../netlify/functions/admin.mjs";
 import coffees from "../netlify/functions/coffees.mjs";
 import qr from "../netlify/functions/qr.mjs";
+import { poursPerBag, bagCostSgd, costPerPour, salesPrice } from "../public/pricing.mjs";
+
+// ---- pricing formulas ----
+assert.equal(poursPerBag(100, 15), 6, "100g bag, 15g pour");
+assert.equal(poursPerBag(250, 15), 16, "rounds down to whole pours");
+assert.equal(poursPerBag(10, 15), 0); assert.equal(poursPerBag(0, 15), 0); assert.equal(poursPerBag(100, 0), 0);
+assert.equal(bagCostSgd(25, 0.8), 31.25); assert.equal(bagCostSgd(25, 0), null); assert.equal(bagCostSgd(NaN, 1), null);
+assert.equal(costPerPour(250, 15, 25, 0.8), 1.95, "31.25 / 16 pours");
+assert.equal(costPerPour(100, 15, 30, 1), 5, "SGD bag, rate 1");
+assert.equal(costPerPour(10, 15, 30, 1), null, "bag smaller than a pour");
+assert.equal(costPerPour(100, 15, NaN, 1), null, "no bag price yet");
+assert.equal(salesPrice(1.95), 6, "(1.95 + 1) x 2 = 5.90, rounded up");
+assert.equal(salesPrice(2.5), 7, "exact whole dollar stays put");
+assert.equal(salesPrice(2.51), 8); assert.equal(salesPrice(0), 2); assert.equal(salesPrice(null), null); assert.equal(salesPrice(NaN), null);
+assert.equal(salesPrice(1.1), 5, "float noise: (1.1 + 1) x 2 = 4.2");
 
 await fs.rm(".data", { recursive: true, force: true });
 const post = (b) => order(new Request("http://x/api/order", { method: "POST", body: JSON.stringify(b) }));
@@ -39,19 +54,22 @@ assert.equal(v.library.length, 3, "library pre-loaded with the 3 current coffees
 assert.equal(v.menu.id, "legacy"); assert.equal(v.sales.length, 1);
 
 r = await adm("POST", { action: "coffee.save", name: "El Diviso Geisha", origin: "Colombia", process: "Washed", roast: "Light",
-  taste: "Jasmine", note: "A short note", roastery: "Sey", brewMethod: "SECRET-V60 1:16 93C", costPrice: "2.37", salesPrice: "8" });
+  taste: "Jasmine", note: "A short note", roastery: "Sey", brewMethod: "SECRET-V60 1:16 93C", costPrice: "2.37", salesPrice: "8", bagGrams: "250", pourGrams: "15", bagPrice: "25", exchangeRate: "0.8137" });
 assert.equal(r.status, 200);
 r = await adm("POST", { action: "coffee.save", name: "Bad", costPrice: "abc" }); assert.equal(r.status, 400, "price must be a number");
+r = await adm("POST", { action: "coffee.save", name: "Bad", bagGrams: "lots" }); assert.equal(r.status, 400, "grams must be a number");
 r = await adm("POST", { action: "coffee.save", name: "" }); assert.equal(r.status, 400, "name required");
 v = await (await adm("GET")).json();
 const geisha = v.library.find((c) => c.name === "El Diviso Geisha");
 assert.equal(geisha.brewMethod, "SECRET-V60 1:16 93C", "admin sees brew method");
 assert.equal(geisha.costPrice, 2.37); assert.equal(geisha.salesPrice, 8);
+assert.deepEqual([geisha.bagGrams, geisha.pourGrams, geisha.bagPrice, geisha.exchangeRate], [250, 15, 25, 0.8137], "calculator inputs saved");
 assert.equal(v.library.find((c) => c.id === "kenya").salesPrice, 6, "seeded coffees get their current price as sales price");
 
 const pub = JSON.stringify(await (await coffees()).json()) + JSON.stringify(await (await menu()).json());
 assert.ok(!pub.includes("SECRET-V60"), "brew method never public");
 assert.ok(!pub.includes("2.37") && !pub.includes("costPrice"), "cost price never public");
+assert.ok(!pub.includes("0.8137") && !pub.includes("bagGrams"), "calculator inputs never public");
 let cf = (await (await coffees()).json()).coffees;
 assert.equal(cf.length, 4); assert.ok(cf.filter((c) => c.onSale).length === 3, "legacy 3 on sale, new coffee greyed");
 
@@ -66,6 +84,7 @@ assert.equal(v.sales.length, 2, "legacy kept: it has orders"); assert.equal(v.me
 assert.equal(v.orders.length, 0, "new sale starts with no orders");
 assert.equal(v.menu.items[0].brewMethod, undefined, "sale snapshot has no brew method");
 assert.equal(v.menu.items[0].costPrice, undefined, "sale snapshot has no cost price");
+assert.equal(v.menu.items[0].bagPrice, undefined, "sale snapshot has no calculator inputs");
 const batch = v.menu.id;
 
 const m2 = await (await menu()).json();

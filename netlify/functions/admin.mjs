@@ -2,7 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { ordersStore, libraryStore, salesStore, settingsStore } from "./lib/store.mjs";
 import { qrInfo } from "./lib/qr.mjs";
 import { remainingStock, byCreated, inSale, fullName, json } from "./lib/logic.mjs";
-import { listSales, getLibrary, pick, saleCosts, costOf, COFFEE_FIELDS, PUBLIC_FIELDS, PRICE_FIELDS } from "./lib/sale.mjs";
+import { listSales, getLibrary, pick, saleCosts, costOf, COFFEE_FIELDS, PUBLIC_FIELDS, NUMBER_FIELDS } from "./lib/sale.mjs";
 import { MENU } from "./lib/menu.mjs";
 
 function authorised(req) {
@@ -25,10 +25,10 @@ async function act(b) {
     await getLibrary();
     if (b.id && !(await library.get(b.id))) return "Coffee not found.";
     const c = { id: b.id || newId() };
-    for (const f of COFFEE_FIELDS.filter((f) => !PRICE_FIELDS.includes(f))) c[f] = clean(b[f], f === "note" || f === "brewMethod" ? 600 : 120);
-    for (const f of PRICE_FIELDS) {
+    for (const f of COFFEE_FIELDS.filter((f) => !NUMBER_FIELDS.includes(f))) c[f] = clean(b[f], f === "note" || f === "brewMethod" ? 600 : 120);
+    for (const f of NUMBER_FIELDS) {
       const v = clean(b[f], 12);
-      if (v && !(Number(v) >= 0)) return "Cost price and sales price must be numbers.";
+      if (v && !(Number(v) >= 0)) return "Prices, grams and exchange rate must be numbers.";
       c[f] = v === "" ? "" : Number(v);
     }
     if (!c.name) return "Coffee needs a name.";

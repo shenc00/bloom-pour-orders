@@ -9,7 +9,7 @@ for (const f of ["menu", "order", "admin", "cancel", "coffees", "qr"]) {
   const m = await import(`../netlify/functions/${f}.mjs`);
   routes[m.config.path] = m.default;
 }
-const types = { ".html": "text/html", ".png": "image/png", ".js": "text/javascript", ".css": "text/css" };
+const types = { ".html": "text/html", ".png": "image/png", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css" };
 const port = process.env.PORT || 8888;
 
 http.createServer(async (req, res) => {
