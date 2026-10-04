@@ -24,6 +24,7 @@ const legacy = () => ({ ...MENU, id: "legacy", publishedAt: 0 });
 // is the fallback until a sale is published, and stays listed while it still has orders.
 export async function listSales(orders = []) {
   const stored = (await salesStore().list()).sort((a, b) => b.publishedAt - a.publishedAt).map((s) => ({ ...MENU, ...s }));
+  if (stored.some((s) => s.id === "legacy")) return stored; // the original sale was edited, so it is stored now
   return !stored.length || orders.some((o) => (o.batch ?? "legacy") === "legacy") ? [...stored, legacy()] : stored;
 }
 export async function currentSale() { return (await listSales())[0]; }

@@ -13,6 +13,12 @@ function authorised(req) {
   return given.length === want.length && timingSafeEqual(given, want);
 }
 
+// Cups ordered per coffee in a sale, ignoring cancelled orders.
+const orderedCups = (orders, saleId) => {
+  const n = {};
+  for (const o of orders) if (!o.cancelled && (o.batch ?? "legacy") === saleId) for (const [id, q] of Object.entries(o.items ?? {})) if (q > 0) n[id] = (n[id] || 0) + q;
+  return n;
+};
 const clean = (v, max = 120) => String(v ?? "").trim().slice(0, max);
 const lines = (v) => String(v ?? "").split("\n").map((l) => clean(l)).filter(Boolean);
 const newId = () => crypto.randomUUID().slice(0, 8);
@@ -58,8 +64,14 @@ async function act(b) {
     };
     if (!sale.eventDate || !sale.hours || !sale.slots.length) return "Date, hours and at least one time window are needed.";
     if (b.batch) { // edit the live sale in place; orders keep counting against it
-      const old = await sales.get(b.batch);
+      const old = (await sales.get(b.batch)) ?? (b.batch === "legacy" ? { id: "legacy", publishedAt: 0 } : null); // first edit of the original sale stores it
       if (!old) return "Sale not found.";
+      const ordered = orderedCups(await ordersStore().list(), old.id);
+      for (const [cid, n] of Object.entries(ordered)) {
+        const kept = items.find((i) => i.id === cid), name = byId[cid] ? fullName(byId[cid]) : cid;
+        if (!kept) return `Can't remove ${name}: ${n} cup${n > 1 ? "s are" : " is"} already ordered. Cancel those orders first.`;
+        if (kept.cap < n) return `Cups for ${name} can't be below the ${n} already ordered.`;
+      }
       Object.assign(sale, { id: old.id, publishedAt: old.publishedAt });
     } else Object.assign(sale, { id: newId(), publishedAt: Date.now() });
     return void (await sales.put(sale));
@@ -110,6 +122,6 @@ export default async (req) => {
   const menu = sales.find((s) => s.id === new URL(req.url).searchParams.get("sale")) ?? sales[0];
   const orders = all.filter((o) => inSale(o, menu)).sort(byCreated);
   const library = await getLibrary();
-  return json({ menu, sales, orders, remaining: remainingStock(all, menu), library, costs: saleCosts(menu, library), qr: await qrInfo() });
+  return json({ menu, sales, orders, remaining: remainingStock(all, menu), library, costs: saleCosts(menu, library), ordered: orderedCups(all, sales[0].id), qr: await qrInfo() });
 };
 export const config = { path: "/api/admin" };

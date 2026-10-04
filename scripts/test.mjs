@@ -62,6 +62,28 @@ let v = await (await adm("GET")).json();
 assert.equal(v.library.length, 3, "library pre-loaded with the 3 current coffees");
 assert.equal(v.menu.id, "legacy"); assert.equal(v.sales.length, 1);
 
+// ---- update the current (original) sale: add and remove coffees ----
+{
+  const upd = (items, extra = {}) => adm("POST", { action: "sale.save", batch: "legacy", eventDate: "Sunday 4/10", hours: "8.30am – 4pm", slots: "10am – 12pm\n12pm – 2pm", items, ...extra });
+  const three = [{ id: "gesha", price: 7, cap: 3 }, { id: "landrace", price: 6, cap: 3 }, { id: "kenya", price: 6, cap: 10 }];
+  assert.ok(v.ordered.gesha >= 1 && v.ordered.kenya >= 1, "admin view reports cups ordered");
+  r = await upd(three.filter((i) => i.id !== "kenya")); assert.equal(r.status, 400, "cannot remove a coffee that has orders");
+  assert.match((await r.json()).error, /Can't remove .*Kenya/);
+  r = await upd(three.map((i) => (i.id === "gesha" ? { ...i, cap: 1 } : i))); assert.equal(r.status, 400, "cannot set cups below what is ordered");
+  await adm("POST", { action: "coffee.save", name: "Temp Coffee", origin: "Peru", salesPrice: "9" });
+  const temp = (await (await adm("GET")).json()).library.find((c) => c.name === "Temp Coffee");
+  r = await upd([...three, { id: temp.id, price: 9, cap: 4 }]); assert.equal(r.status, 200, "add a coffee to the current sale");
+  let w = await (await adm("GET")).json();
+  assert.equal(w.menu.id, "legacy"); assert.equal(w.sales.length, 1, "edited original sale is not duplicated");
+  assert.equal(w.menu.items.length, 4); assert.equal(w.remaining[temp.id], 4); assert.equal(w.ordered[temp.id], undefined);
+  assert.equal((await (await menu()).json()).menu.items.length, 4, "main page shows the added coffee");
+  assert.equal(w.orders.length, v.orders.length, "orders stay with the sale");
+  r = await upd(three); assert.equal(r.status, 200, "remove a coffee nobody ordered");
+  w = await (await adm("GET")).json(); assert.equal(w.menu.items.length, 3);
+  assert.equal((await (await menu()).json()).menu.items.length, 3, "main page drops it again");
+  await adm("POST", { action: "coffee.delete", id: temp.id });
+}
+
 r = await adm("POST", { action: "coffee.save", name: "El Diviso Geisha", origin: "Colombia", process: "Washed", roast: "Light",
   taste: "Jasmine", note: "A short note", roastery: "Sey", brewRatio: "1:15.7", brewTemp: "93.7", costPrice: "2.37", salesPrice: "8", bagGrams: "250", pourGrams: "15", bagPrice: "25", exchangeRate: "0.8137" });
 assert.equal(r.status, 200);

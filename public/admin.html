@@ -47,6 +47,7 @@ td button{padding:4px 8px;font-size:13px}
 
   <section id="t-sale" hidden>
     <h2>Set up a sale</h2>
+    <div class="hint" id="curSale"></div>
     <div class="hint">Pick coffees from your library. “Publish as new sale” starts fresh stock and a fresh orders list; old sales stay under Orders. “Update current sale” changes the live sale without resetting orders. Prices start from each coffee's sales price in the library; change one here to set a different price for this sale only.</div>
     <form id="sf"></form>
   </section>
@@ -137,16 +138,16 @@ function drawLibrary(){
 }
 
 function drawSale(){
-  const cur=data.sales[0],live=cur.id!=='legacy';
+  const cur=data.sales[0],ordered=data.ordered||{};
   const inCur=Object.fromEntries(cur.items.map(i=>[i.id,i]));
-  const f=$('#sf');
+  const f=$('#sf');$('#curSale').textContent=`Current sale: ${cur.eventDate} (${cur.items.map(full).join(', ')})`;
   const txt=(id,l,v,ta)=>[el('label',{textContent:l}),el(ta?'textarea':'input',{id,value:v,rows:4})];
   f.replaceChildren(...txt('s_date','Date (shown on main page)',cur.eventDate),...txt('s_hours','Operating hours',cur.hours),
     ...txt('s_cp','Collection point',cur.collectionPoint),...txt('s_slots','Time windows (one per line)',cur.slots.join('\n'),1),...txt('s_notes','Notes on main page (one per line)',cur.notes.join('\n'),1),
-    el('label',{textContent:'Coffees on sale (price $ / cups)'}),
-    ...data.library.map(c=>{const o=inCur[c.id];return el('div',{className:'pick'},el('input',{type:'checkbox',id:'p_'+c.id,checked:!!o}),el('span',{textContent:full(c)}),el('input',{type:'number',id:'pr_'+c.id,min:0,step:'0.5',placeholder:'$',value:c.salesPrice||(o?.price??'')}),el('input',{type:'number',id:'cp_'+c.id,min:1,step:1,placeholder:'cups',value:o?.cap??''}))}),
+    el('label',{textContent:'Coffees on sale (price $ / cups)'}),el('div',{className:'hint',textContent:'Tick to add a coffee, untick to remove it. A coffee with orders stays ticked until those orders are cancelled.'}),
+    ...data.library.map(c=>{const o=inCur[c.id];const n=o?ordered[c.id]||0:0;return el('div',{className:'pick'},el('input',{type:'checkbox',id:'p_'+c.id,checked:!!o,disabled:n>0,ariaLabel:`Sell ${full(c)}`}),el('span',{textContent:full(c)+(n?` (${n} ordered)`:'')}),el('input',{type:'number',id:'pr_'+c.id,min:0,step:'0.5',placeholder:'$',value:c.salesPrice||(o?.price??'')}),el('input',{type:'number',id:'cp_'+c.id,min:Math.max(1,n),step:1,placeholder:'cups',value:o?.cap??''}))}),
     data.library.length?'':'Add coffees in the Coffee library first.',
-    el('div',{className:'row'},el('button',{type:'submit',textContent:'Publish as new sale'}),live?btn('Update current sale',()=>save(cur.id),'alt'):''));
+    el('div',{className:'row'},el('button',{type:'submit',textContent:'Publish as new sale'}),btn('Update current sale',()=>save(cur.id),'alt')));
   const body=batch=>({action:'sale.save',batch,eventDate:$('#s_date').value,hours:$('#s_hours').value,collectionPoint:$('#s_cp').value,slots:$('#s_slots').value,notes:$('#s_notes').value,
     items:data.library.filter(c=>$('#p_'+c.id).checked).map(c=>({id:c.id,price:$('#pr_'+c.id).value,cap:$('#cp_'+c.id).value}))});
   const save=batch=>{sel='';act(body(batch),batch?'Current sale updated.':'New sale published. Stock and orders start fresh.')};
