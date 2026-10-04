@@ -44,7 +44,7 @@ td button{padding:4px 8px;font-size:13px}
 
   <section id="t-sale" hidden>
     <h2>Set up a sale</h2>
-    <div class="hint">Pick coffees from your library. “Publish as new sale” starts fresh stock and a fresh orders list; old sales stay under Orders. “Update current sale” changes the live sale without resetting orders.</div>
+    <div class="hint">Pick coffees from your library. “Publish as new sale” starts fresh stock and a fresh orders list; old sales stay under Orders. “Update current sale” changes the live sale without resetting orders. Prices start from each coffee's sales price in the library; change one here to set a different price for this sale only.</div>
     <form id="sf"></form>
   </section>
 
@@ -83,12 +83,12 @@ function drawOrders(){
     tr.append(cell(t),cell(o.name),cell(o.phone),cell(order),cell('$'+o.total),cell(o.method),cell(o.slot),cell([o.address,o.notes].filter(Boolean).join(' · ')),cell(paid),cell(done),cell(btn(o.cancelled?'Restore':'Cancel',()=>patch({id:o.id,cancelled:!o.cancelled}))));return tr}));
 }
 
-const FIELDS=[['name','Name (e.g. El Diviso Geisha)'],['origin','Origin (e.g. Colombia)'],['process','Process (e.g. Washed)'],['roast','Roast (e.g. Light)'],['taste','Taste profile'],['roastery','Roastery'],['note','Short note','t'],['brewMethod','Brew method (private, only you see this)','t']];
+const FIELDS=[['name','Name (e.g. El Diviso Geisha)'],['origin','Origin (e.g. Colombia)'],['process','Process (e.g. Washed)'],['roast','Roast (e.g. Light)'],['taste','Taste profile'],['roastery','Roastery'],['note','Short note','t'],['brewMethod','Brew method (private, only you see this)','t'],['costPrice','Cost price per cup, $ (private, only you see this)','n'],['salesPrice','Sales price per cup, $ (used in Sale setup and on the main page)','n']];
 function drawLibrary(){
-  $('#lib').replaceChildren(...data.library.map(c=>el('div',{className:'card'},el('span',{},el('b',{textContent:full(c)}),el('small',{textContent:[c.process,c.roast,c.roastery].filter(Boolean).join(' · ')})),btn('Edit',()=>{editing=c;drawLibrary();window.scrollTo(0,document.body.scrollHeight)}))),
+  $('#lib').replaceChildren(...data.library.map(c=>el('div',{className:'card'},el('span',{},el('b',{textContent:full(c)}),el('small',{textContent:[c.process,c.roast,c.roastery,c.salesPrice!==''&&c.salesPrice!=null?`sells $${c.salesPrice}`:'',c.costPrice!==''&&c.costPrice!=null?`cost $${c.costPrice}`:''].filter(Boolean).join(' · ')})),btn('Edit',()=>{editing=c;drawLibrary();window.scrollTo(0,document.body.scrollHeight)}))),
     data.library.length?'':'No coffees yet.');
   $('#cfTitle').textContent=editing?`Edit ${full(editing)}`:'Add a coffee';
-  const f=$('#cf');f.replaceChildren(...FIELDS.flatMap(([k,l,t])=>[el('label',{textContent:l}),el(t?'textarea':'input',{id:'cf_'+k,rows:2,value:editing?.[k]||'',maxLength:t?600:120})]),
+  const f=$('#cf');f.replaceChildren(...FIELDS.flatMap(([k,l,t])=>[el('label',{textContent:l}),el(t==='t'?'textarea':'input',{id:'cf_'+k,rows:2,value:editing?.[k]??'',maxLength:t==='t'?600:120,...(t==='n'?{type:'number',min:0,step:'0.01',style:'max-width:200px'}:{})})]),
     el('div',{className:'row'},el('button',{type:'submit',textContent:editing?'Save changes':'Add coffee'}),
       editing?btn('Cancel',()=>{editing=null;drawLibrary()},'alt'):'',
       editing?btn('Delete',()=>{if(confirm(`Delete ${full(editing)} from the library? Past and current sales keep their own copy.`)){const id=editing.id;editing=null;act({action:'coffee.delete',id},'Coffee deleted.')}},'danger'):''));
@@ -103,7 +103,7 @@ function drawSale(){
   f.replaceChildren(...txt('s_date','Date (shown on main page)',cur.eventDate),...txt('s_hours','Operating hours',cur.hours),
     ...txt('s_cp','Collection point',cur.collectionPoint),...txt('s_slots','Time windows (one per line)',cur.slots.join('\n'),1),...txt('s_notes','Notes on main page (one per line)',cur.notes.join('\n'),1),
     el('label',{textContent:'Coffees on sale (price $ / cups)'}),
-    ...data.library.map(c=>{const o=inCur[c.id];return el('div',{className:'pick'},el('input',{type:'checkbox',id:'p_'+c.id,checked:!!o}),el('span',{textContent:full(c)}),el('input',{type:'number',id:'pr_'+c.id,min:0,step:'0.5',placeholder:'$',value:o?.price??''}),el('input',{type:'number',id:'cp_'+c.id,min:1,step:1,placeholder:'cups',value:o?.cap??''}))}),
+    ...data.library.map(c=>{const o=inCur[c.id];return el('div',{className:'pick'},el('input',{type:'checkbox',id:'p_'+c.id,checked:!!o}),el('span',{textContent:full(c)}),el('input',{type:'number',id:'pr_'+c.id,min:0,step:'0.5',placeholder:'$',value:c.salesPrice||(o?.price??'')}),el('input',{type:'number',id:'cp_'+c.id,min:1,step:1,placeholder:'cups',value:o?.cap??''}))}),
     data.library.length?'':'Add coffees in the Coffee library first.',
     el('div',{className:'row'},el('button',{type:'submit',textContent:'Publish as new sale'}),live?btn('Update current sale',()=>save(cur.id),'alt'):''));
   const body=batch=>({action:'sale.save',batch,eventDate:$('#s_date').value,hours:$('#s_hours').value,collectionPoint:$('#s_cp').value,slots:$('#s_slots').value,notes:$('#s_notes').value,

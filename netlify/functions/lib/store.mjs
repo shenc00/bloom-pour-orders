@@ -34,7 +34,9 @@ function localStore(name) {
     async list() {
       await fs.mkdir(dir, { recursive: true });
       const names = await fs.readdir(dir);
-      return Promise.all(names.map(async (n) => JSON.parse(await fs.readFile(path.join(dir, n), "utf8"))));
+      // a file can vanish between readdir and read when a rejected order is deleted
+      const all = await Promise.all(names.map(async (n) => { try { return JSON.parse(await fs.readFile(path.join(dir, n), "utf8")); } catch { return null; } }));
+      return all.filter(Boolean);
     },
     async get(id) {
       try { return JSON.parse(await fs.readFile(file(id), "utf8")); } catch { return null; }

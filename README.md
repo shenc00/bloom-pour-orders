@@ -6,7 +6,7 @@ Mobile-friendly order page for Bloom Pour pour-over coffee, built for Netlify.
 - **`/coffees`** – the whole coffee library for customers (name, origin, process, roast, taste, note, roastery). Coffees not on sale this round are greyed out. Brew method is never shown.
 - **`/admin`** – password-protected, three tabs:
   - **Orders**: per sale (current and past), totals per coffee, paid / collected ticks, cancel, CSV download.
-  - **Coffee library**: add, edit and delete coffees, including a private brew method field.
+  - **Coffee library**: add, edit and delete coffees, including a private brew method and private cost price. The sales price pre-fills Sale setup.
   - **Sale setup**: date, hours, time windows, and which library coffees are on sale with price and cups. *Publish as new sale* starts fresh stock and orders; *Update current sale* edits the live one.
   - **PayNow QR**: upload a new QR image and set its expiry date. A warning banner shows in admin for the last 7 days and after expiry.
 - Stock limits are per sale and enforced on the server, so two people can't take the last cup.

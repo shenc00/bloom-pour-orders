@@ -1,5 +1,5 @@
 import { ordersStore } from "./lib/store.mjs";
-import { remainingStock, validateOrder, byCreated, fullName, json } from "./lib/logic.mjs";
+import { remainingStock, validateOrder, fullName, json } from "./lib/logic.mjs";
 import { currentSale } from "./lib/sale.mjs";
 import { notify } from "./lib/notify.mjs";
 
@@ -19,16 +19,18 @@ export default async (req) => {
     if (order.items[i.id] > before[i.id])
       return json({ error: `Sorry, only ${before[i.id]} cup(s) of ${fullName(i)} left.`, remaining: before }, 409);
 
-  // Write first, then re-check in a stable order so simultaneous orders can't oversell.
+  // Write first, then re-check against every other visible order. Two simultaneous orders for the
+  // last cups may both be turned away (they can retry), but they can never both be accepted.
   await store.put(order);
-  const all = (await store.list()).sort(byCreated);
-  const earlier = [];
-  for (const o of all) { if (o.id === order.id) break; earlier.push(o); }
-  const left = remainingStock(earlier, sale);
+  const left = remainingStock((await store.list()).filter((o) => o.id !== order.id), sale);
   const oversold = sale.items.find((i) => order.items[i.id] > left[i.id]);
   if (oversold) {
     await store.del(order.id);
-    return json({ error: `Sorry, ${fullName(oversold)} just sold out. Please adjust your order.`, remaining: remainingStock(await store.list(), sale) }, 409);
+    const now = remainingStock(await store.list(), sale);
+    const error = now[oversold.id] >= order.items[oversold.id]
+      ? "Another order came in at the same moment. Please press Place order again."
+      : `Sorry, ${fullName(oversold)} just sold out. Please adjust your order.`;
+    return json({ error, remaining: now }, 409);
   }
   const lines = sale.items.filter((i) => order.items[i.id] > 0).map((i) => `${order.items[i.id]} x ${fullName(i)}`);
   await notify([

@@ -39,15 +39,19 @@ assert.equal(v.library.length, 3, "library pre-loaded with the 3 current coffees
 assert.equal(v.menu.id, "legacy"); assert.equal(v.sales.length, 1);
 
 r = await adm("POST", { action: "coffee.save", name: "El Diviso Geisha", origin: "Colombia", process: "Washed", roast: "Light",
-  taste: "Jasmine", note: "A short note", roastery: "Sey", brewMethod: "SECRET-V60 1:16 93C" });
+  taste: "Jasmine", note: "A short note", roastery: "Sey", brewMethod: "SECRET-V60 1:16 93C", costPrice: "2.37", salesPrice: "8" });
 assert.equal(r.status, 200);
+r = await adm("POST", { action: "coffee.save", name: "Bad", costPrice: "abc" }); assert.equal(r.status, 400, "price must be a number");
 r = await adm("POST", { action: "coffee.save", name: "" }); assert.equal(r.status, 400, "name required");
 v = await (await adm("GET")).json();
 const geisha = v.library.find((c) => c.name === "El Diviso Geisha");
 assert.equal(geisha.brewMethod, "SECRET-V60 1:16 93C", "admin sees brew method");
+assert.equal(geisha.costPrice, 2.37); assert.equal(geisha.salesPrice, 8);
+assert.equal(v.library.find((c) => c.id === "kenya").salesPrice, 6, "seeded coffees get their current price as sales price");
 
 const pub = JSON.stringify(await (await coffees()).json()) + JSON.stringify(await (await menu()).json());
 assert.ok(!pub.includes("SECRET-V60"), "brew method never public");
+assert.ok(!pub.includes("2.37") && !pub.includes("costPrice"), "cost price never public");
 let cf = (await (await coffees()).json()).coffees;
 assert.equal(cf.length, 4); assert.ok(cf.filter((c) => c.onSale).length === 3, "legacy 3 on sale, new coffee greyed");
 
@@ -61,6 +65,7 @@ v = await (await adm("GET")).json();
 assert.equal(v.sales.length, 2, "legacy kept: it has orders"); assert.equal(v.menu.eventDate, "Sunday 11/10");
 assert.equal(v.orders.length, 0, "new sale starts with no orders");
 assert.equal(v.menu.items[0].brewMethod, undefined, "sale snapshot has no brew method");
+assert.equal(v.menu.items[0].costPrice, undefined, "sale snapshot has no cost price");
 const batch = v.menu.id;
 
 const m2 = await (await menu()).json();
@@ -71,7 +76,7 @@ r = await post({ ...base, slot: "9am – 11am", items: { [geisha.id]: 1, kenya: 
 r = await post({ ...base, slot: "10am – 12pm", items: { kenya: 1 } }); assert.equal(r.status, 400, "old slot rejected");
 
 v = await (await adm("GET", null, "legacy")).json();
-assert.ok(v.orders.length > 5 && v.orders.every((o) => (o.batch ?? "legacy") === "legacy"), "past sale orders still viewable");
+assert.ok(v.orders.length >= 3 && v.orders.every((o) => (o.batch ?? "legacy") === "legacy"), "past sale orders still viewable");
 v = await (await adm("GET", null, batch)).json(); assert.equal(v.orders.length, 1);
 
 r = await adm("POST", { ...sale, batch, hours: "10am – 2pm", items: [{ id: geisha.id, price: 8, cap: 4 }, { id: "kenya", price: 6, cap: 5 }] });

@@ -2,9 +2,11 @@ import { MENU } from "./menu.mjs";
 import { libraryStore, salesStore } from "./store.mjs";
 import { fullName } from "./logic.mjs";
 
-// Library coffees have these fields. brewMethod is private: never copy it to a sale or a public response.
-export const COFFEE_FIELDS = ["name", "origin", "process", "taste", "roast", "note", "roastery", "brewMethod"];
-export const PUBLIC_FIELDS = COFFEE_FIELDS.filter((f) => f !== "brewMethod");
+// Library coffees have these fields. Only PUBLIC_FIELDS are copied into a sale or sent to customers;
+// brewMethod and costPrice are private to admin. salesPrice is the default price when you set up a sale.
+export const PUBLIC_FIELDS = ["name", "origin", "process", "taste", "roast", "note", "roastery"];
+export const PRICE_FIELDS = ["costPrice", "salesPrice"];
+export const COFFEE_FIELDS = [...PUBLIC_FIELDS, "brewMethod", ...PRICE_FIELDS];
 export const pick = (o, keys) => Object.fromEntries(keys.map((k) => [k, o[k] ?? ""]));
 
 const legacy = () => ({ ...MENU, id: "legacy", publishedAt: 0 });
@@ -21,7 +23,7 @@ export async function currentSale() { return (await listSales())[0]; }
 export async function getLibrary() {
   const s = libraryStore();
   if (!(await s.get("_seeded"))) {
-    for (const i of MENU.items) await s.put({ ...pick(i, COFFEE_FIELDS), id: i.id });
+    for (const i of MENU.items) await s.put({ ...pick(i, COFFEE_FIELDS), id: i.id, salesPrice: i.price });
     await s.put({ id: "_seeded" });
   }
   return (await s.list()).filter((c) => c.id !== "_seeded").sort((a, b) => fullName(a).localeCompare(fullName(b)));
