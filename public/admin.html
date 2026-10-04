@@ -130,10 +130,16 @@ function onCalc(apply){
   if(apply&&cost!=null){$('#cf_costPrice').value=cost.toFixed(2);onCost()}
 }
 // Private brew card shown under a coffee in the library. Blank fields show the same defaults as the form.
+// Coffee per cup is a scratch box (not saved): change it and water per cup follows the ratio.
 function brewCard(c){
-  const ratio=c.brewRatio||'1:15',dose=c.pourGrams||15,r=parseFloat(ratio.split(':')[1]);
-  const rows=[['Brew ratio',ratio],['Coffee per cup',`${dose} g`],['Water per cup',r>0?`${Math.round(dose*r)} g`:''],['Temperature',`${c.brewTemp||95} °C`],['Grinder',c.grinder||'RACCEA DF60'],['Grind size',c.grindSize||70],['Profit ratio (sales ÷ cost)',c.costPrice>0&&c.salesPrice>0?`${(c.salesPrice/c.costPrice).toFixed(2)}x ($${c.salesPrice} ÷ $${c.costPrice})`:'']];
-  return el('div',{className:'qrbox'},el('b',{textContent:`${full(c)}: brew method (private)`}),...rows.filter(([,v])=>v!=='').map(([k,v])=>el('div',{textContent:`${k}: ${v}`})));
+  const ratio=c.brewRatio||'1:15',r=parseFloat(ratio.split(':')[1]);
+  const water=el('span'),dose=el('input',{type:'number',min:0,step:'any',value:c.pourGrams||15,style:'max-width:90px'});
+  const calc=()=>water.textContent=r>0&&dose.value>0?`${Math.round(dose.value*r)} g`:'';
+  dose.oninput=calc;calc();
+  const line=(k,v)=>el('div',{textContent:`${k}: ${v}`});
+  return el('div',{className:'qrbox'},line('Brew ratio',ratio),el('div',{},'Coffee per cup (g): ',dose),el('div',{},'Water per cup: ',water),
+    line('Temperature',`${c.brewTemp||95} °C`),line('Grinder',c.grinder||'RACCEA DF60'),line('Grind size',c.grindSize||70),
+    ...(c.costPrice>0&&c.salesPrice>0?[line('Profit ratio',(c.salesPrice/c.costPrice).toFixed(2))]:[]));
 }
 function drawLibrary(){
   $('#lib').replaceChildren(...data.library.flatMap(c=>[el('div',{className:'card'},el('span',{},el('b',{textContent:full(c)}),el('small',{textContent:[c.process,c.roast,c.roastery,c.salesPrice!==''&&c.salesPrice!=null?`sells $${c.salesPrice}`:'',c.costPrice!==''&&c.costPrice!=null?`cost $${c.costPrice}`:''].filter(Boolean).join(' · ')})),el('span',{className:'row',style:'margin:0'},btn(viewing===c.id?'Hide':'View',()=>{viewing=viewing===c.id?'':c.id;drawLibrary()},'alt'),btn('Edit',()=>{editing=c;drawLibrary();window.scrollTo(0,document.body.scrollHeight)}))),viewing===c.id?brewCard(c):'']),
