@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 760" width="640" height="760">
+  <title>Bloom Pour</title>
+  <rect width="640" height="760" fill="#3d4a57"/>
+  <g transform="translate(64 20)">
+  <!-- big cat: line -->
+  <polygon points="122,205 132,135 192,180" fill="#3d4a57" stroke="#98a7c8" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+  <polygon points="278,205 268,135 208,180" fill="#3d4a57" stroke="#98a7c8" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="200" cy="255" r="90" fill="#3d4a57" stroke="#98a7c8" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="165" cy="255" r="11" fill="#9cc8f5"/>
+  <circle cx="235" cy="255" r="11" fill="#9cc8f5"/>
+  <!-- raised paw: line -->
+  <rect x="76" y="238" width="34" height="86" rx="17" fill="#3d4a57" stroke="#98a7c8" stroke-width="8" stroke-linejoin="round" stroke-linecap="round" transform="rotate(-12 93 281)"/>
+  <!-- small cat: solid -->
+  <polygon points="292,258 294,188 344,226" fill="#DEE5DE" stroke="#3d4a57" stroke-width="8" stroke-linejoin="round"/>
+  <polygon points="398,258 396,188 346,226" fill="#DEE5DE" stroke="#3d4a57" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="345" cy="285" r="60" fill="#DEE5DE" stroke="#3d4a57" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="322" cy="285" r="8" fill="#3d4a57"/>
+  <circle cx="368" cy="285" r="8" fill="#3d4a57"/>
+  <!-- dripper: line -->
+  <polygon points="135,346 375,346 305,415 205,415" fill="#3d4a57" stroke="#FAFBF9" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+  <rect x="105" y="326" width="300" height="20" rx="4" fill="#3d4a57" stroke="#FAFBF9" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="255" y1="432" x2="255" y2="456" stroke="#98a7c8" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="255" cy="478" r="6" fill="#98a7c8"/>
+</g>
+  <text x="326" y="610" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="64" letter-spacing="12" fill="#DEE5DE">BLOOM POUR</text>
+  <text x="325" y="662" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="22" letter-spacing="10" fill="#98a7c8">POUR OVER COFFEE</text>
+</svg>
