@@ -1,6 +1,6 @@
 # Instagram content pipeline – plan
 
-Status: plan only, nothing built yet.
+Status: account connected, publish script built. Templates and caption drafting not built yet.
 
 Goal: run the Bloom Pour Instagram page from Claude Code. Claude pulls the live sale from the order app, renders the images, drafts the caption, and publishes through an Instagram MCP server once the owner approves.
 
@@ -68,6 +68,10 @@ social/
   metrics.csv  insights log
 ```
 
-## Open question
+## Decision: no MCP server
 
-Which Instagram MCP server will be used? It decides whether the pipeline uploads local files or goes through public URLs on Netlify.
+Publishing goes through `social/publish.mjs`, a dependency-free script that calls the Instagram API (`graph.instagram.com`, Instagram Login token) directly. Community Instagram MCP servers were rejected: unofficial, single maintainer, no verifiable source, and they would hold a token that can post to the business account. Images are published from public URLs on Netlify (`SITE_URL/social/<slug>/<file>`), so finished JPEGs go in `public/social/<slug>/` and deploy first.
+
+Env vars (gitignored `.env` / `.env.txt`): `IG_ACCESS_TOKEN`, `IG_USER_ID`, `SITE_URL`, `IG_APP_ID`, `IG_APP_SECRET`.
+
+Phase 0 status: token and connection verified (`whoami`). First test post not made yet. Token expires about 2026-12-10; run `refresh` before then.
