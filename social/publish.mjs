@@ -66,7 +66,7 @@ async function post(dir) {
   let creation;
   if (meta.video) {
     // ponytail: Instagram Login tokens reject resumable upload, so video must be hosted at a public URL.
-    creation = (await call('POST', `${user}/media`, { media_type: 'REELS', video_url: urls[0], share_to_feed: 'true', caption, access_token: token })).id;
+    creation = (await call('POST', `${user}/media`, { media_type: 'REELS', video_url: urls[0], share_to_feed: 'true', thumb_offset: String(meta.thumb_offset ?? 0), caption, access_token: token })).id;
     await waitFinished(creation, token, 90);
   } else if (urls.length === 1) {
     creation = (await call('POST', `${user}/media`, { image_url: urls[0], caption, access_token: token })).id;
