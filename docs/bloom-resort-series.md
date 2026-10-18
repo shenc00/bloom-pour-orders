@@ -234,6 +234,8 @@ Second body: **Canon 700D** (APS-C), used only with the Sigma 4.5mm f/2.8 EX DC 
 
 All durations are the length to record per take. Record 10s or more of each, so there is room to trim. Setups assume the Canon 6D Mark II in Movie mode at the settings below. Distances are starting points; adjust on site.
 
+**Footage location:** `C:\Users\Admin\Videos\BloomPour\BloomResort_S1\Footage\` (local only, outside this repo and not in git). `_trimmed/` holds the picks and backups named below. The raw camera files (`MVI_xxxx`) sit in per-lens folders: `F2/`, `F3/`, `F4/`, `F5/`, `F6_8/`, `F9/`, `M5_6_7/`, `T5/`, `T9/`. `_test/` is scratch.
+
 **Status column:** Done = usable footage in `Footage/_trimmed` (file names given). Partial = usable but better to reshoot. `-` = not shot yet. Extra clips outside the plan: `X_paws_t01` (toe beans), `X_sleep-paw_t01` (sleeping, paw in the foreground), `X_gaze-window_t01` (profile looking out toward the window, 26s), `X_sleep-face-macro_t01` (sleeping face close-up). Most cat clips from the second session are 1280x720 at 50p (slow-motion capable); the first session and the estate clips are 1920x1080 at 25p.
 
 Fisheye extras (700D, 1920x1080 25p, full circle) from the F3 and F4-F8 sessions, kept for variety:
