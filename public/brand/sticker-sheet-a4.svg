@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="210mm" height="297mm" viewBox="0 0 210 297">
+  <title>Bloom Pour round cup stickers, A4</title>
+  <!-- Print at 100% / "Actual size" (no fit-to-page). Each sticker cuts at 28 mm (grey line);
+       the slate background runs 0.75 mm past the cut so an off-centre cut shows no white edge.
+       A 1-1/8" (28.6 mm) craft circle punch also fits. -->
+  <defs>
+    <!-- 512 units = 28 mm cut circle; viewBox adds the bleed (540 units = 29.5 mm) -->
+    <symbol id="sticker" viewBox="-14 -14 540 540">
+      <circle cx="256" cy="256" r="270" fill="#3d4a57"/>
+      <circle cx="256" cy="256" r="232" fill="none" stroke="#DEE5DE" stroke-width="6"/>
+      <!-- logo-icon.svg artwork, scaled and centred -->
+      <g transform="translate(64 -5.6) scale(0.8)">
+        <polygon points="122,205 132,135 192,180" fill="#3d4a57" stroke="#98a7c8" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+        <polygon points="278,205 268,135 208,180" fill="#3d4a57" stroke="#98a7c8" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="200" cy="255" r="90" fill="#3d4a57" stroke="#98a7c8" stroke-width="8"/>
+        <circle cx="165" cy="255" r="11" fill="#9cc8f5"/>
+        <circle cx="235" cy="255" r="11" fill="#9cc8f5"/>
+        <rect x="76" y="238" width="34" height="86" rx="17" fill="#3d4a57" stroke="#98a7c8" stroke-width="8" transform="rotate(-12 93 281)"/>
+        <polygon points="292,258 294,188 344,226" fill="#DEE5DE" stroke="#3d4a57" stroke-width="8" stroke-linejoin="round"/>
+        <polygon points="398,258 396,188 346,226" fill="#DEE5DE" stroke="#3d4a57" stroke-width="8" stroke-linejoin="round"/>
+        <circle cx="345" cy="285" r="60" fill="#DEE5DE" stroke="#3d4a57" stroke-width="8"/>
+        <circle cx="322" cy="285" r="8" fill="#3d4a57"/>
+        <circle cx="368" cy="285" r="8" fill="#3d4a57"/>
+        <polygon points="135,346 375,346 305,415 205,415" fill="#3d4a57" stroke="#FAFBF9" stroke-width="8" stroke-linejoin="round"/>
+        <rect x="105" y="326" width="300" height="20" rx="4" fill="#3d4a57" stroke="#FAFBF9" stroke-width="8" stroke-linejoin="round"/>
+        <line x1="255" y1="432" x2="255" y2="456" stroke="#98a7c8" stroke-width="8" stroke-linecap="round"/>
+        <circle cx="255" cy="478" r="6" fill="#98a7c8"/>
+      </g>
+      <!-- name along the bottom arc, reading left to right -->
+      <path id="bottom-arc" d="M 56 256 A 200 200 0 0 0 456 256" fill="none"/>
+      <text font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="40" letter-spacing="7" fill="#DEE5DE">
+        <textPath xlink:href="#bottom-arc" href="#bottom-arc" startOffset="50%" text-anchor="middle">BLOOM POUR</textPath>
+      </text>
+      <!-- cut line -->
+      <circle cx="256" cy="256" r="256" fill="none" stroke="#9aa3ad" stroke-width="2"/>
+    </symbol>
+  </defs>
+
+  <!-- 6 x 8 grid: 29.5 mm stickers (with bleed), 32 mm pitch -->
+  <g id="grid">
+    <use href="#sticker" xlink:href="#sticker" x="10.25" y="18" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="42.25" y="18" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="74.25" y="18" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="106.25" y="18" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="138.25" y="18" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="170.25" y="18" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="10.25" y="50" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="42.25" y="50" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="74.25" y="50" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="106.25" y="50" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="138.25" y="50" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="170.25" y="50" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="10.25" y="82" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="42.25" y="82" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="74.25" y="82" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="106.25" y="82" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="138.25" y="82" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="170.25" y="82" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="10.25" y="114" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="42.25" y="114" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="74.25" y="114" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="106.25" y="114" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="138.25" y="114" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="170.25" y="114" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="10.25" y="146" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="42.25" y="146" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="74.25" y="146" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="106.25" y="146" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="138.25" y="146" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="170.25" y="146" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="10.25" y="178" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="42.25" y="178" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="74.25" y="178" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="106.25" y="178" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="138.25" y="178" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="170.25" y="178" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="10.25" y="210" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="42.25" y="210" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="74.25" y="210" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="106.25" y="210" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="138.25" y="210" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="170.25" y="210" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="10.25" y="242" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="42.25" y="242" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="74.25" y="242" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="106.25" y="242" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="138.25" y="242" width="29.5" height="29.5"/>
+    <use href="#sticker" xlink:href="#sticker" x="170.25" y="242" width="29.5" height="29.5"/>
+  </g>
+  <g font-family="Arial,Helvetica,sans-serif" font-size="3" fill="#3d4a57">
+    <text x="10.25" y="283">Bloom Pour cup stickers - 28 mm, cut on the grey line. Print at 100% (Actual size), not fit-to-page.</text>
+    <line x1="149.75" y1="286.5" x2="199.75" y2="286.5" stroke="#3d4a57" stroke-width="0.3"/>
+    <line x1="149.75" y1="285" x2="149.75" y2="288" stroke="#3d4a57" stroke-width="0.3"/>
+    <line x1="199.75" y1="285" x2="199.75" y2="288" stroke="#3d4a57" stroke-width="0.3"/>
+    <text x="174.75" y="291.5" text-anchor="middle">50 mm - measure to check scale</text>
+  </g>
+</svg>
