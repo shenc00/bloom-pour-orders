@@ -118,7 +118,7 @@ Episode 2 (The Review) stays with the normal lenses.
 
 **Keeping the two looks one series:** same grade (warm room, grey haze outside), same ambient sound bed, circle accents of 2-4s with at least 5s of rectangular shots between them (Ep 4 excepted). Do not de-fish the circle into a rectangle.
 
-**Extra shots this needs:** an M1 variant with the cup from directly above, framed so the rim matches the porthole (the key match cut); an M5 variant with the eye centred in frame; optionally a centred rectangular shot of a path-light glow or the pavilion dome.
+**Extra shots this needs:** an M1 variant with the cup from directly above, framed so the rim matches the porthole (the key match cut; covered for now by `M1_outpaint_porthole_0218.mp4`, see M1); an M5 variant with the eye centred in frame; optionally a centred rectangular shot of a path-light glow or the pavilion dome.
 
 **Build (later):** four reusable pieces in OpenMontage: porthole layout (circle mask, rim ring, black background, text bands), iris transition, circle-open, and the round-shape match helper. Source circle: centre (952, 538), radius about 452.
 
@@ -319,9 +319,9 @@ Never go below f/4 on the cat. Focus on the nearest eye. IS on when handheld, of
 
 | Frame | Composition | Setup | Take | Used in | Timing | Status |
 |-------|-------------|-------|------|---------|--------|--------|
-| M1 Bloom, overhead | Coffee bed fills about two-thirds of the frame | Tripod or beanbag, camera 30-40cm above the dripper, f/4-f/5.6, 50p | 10-12s (start before water touches the grounds) | Hook, every episode | Anytime | - |
-| M2 Bloom, side | Dome rising, lens level with the dripper rim | Tripod, f/5.6, 50p | 6s | Hook alternative, Ep 4 slow pour | Anytime | - |
-| M3 Drip into the cup | Drops forming and falling, side angle on the cup | Tripod, f/4, 50p | 4s | Ep 1, 4 | Anytime | - |
+| M1 Bloom, overhead | Straight down, lens dead-centre over the dripper, sensor level; the whole filter rim is a circle just inside the frame, the bed about 60% of the height (the same framing serves the hook and the porthole match cut). Pour into the centre, then pull the kettle out of frame | Tripod with an overhead arm, camera about 70cm above the dripper (30-40cm is too close: the rim falls outside the frame), f/8, **1080p** 50p, MF on the bed | 10-12s (start before water touches the grounds) | Hook, every episode | Anytime | Partial: **MVI_0218 0:24-0:33 is the pick** (50p, overhead, top of the filter clipped and off-centre; weak light-roast bloom). Two finished versions in `M1/`: `M1_outpaint_porthole_0218.mp4` (filter completed by a static AI plate, Bria Expand, the real video on top; the cleanest top-down circle, use it for the match cut) and `M1_outpaint_full_0218.mp4` (rectangular). Backup: MVI_0224 0:59-1:08 (dark backdrop, best look, but the camera is tilted): `M1_outpaint_full_0224.mp4` (rectangular) and `M1_warp_porthole_0224.mp4` (stretched to round, bed slightly low; a bloom porthole, not the rim match). MVI_0215 (25p, 0:13-0:25) is a last resort. All 50p takes so far are 720p; reshoot at 1080p50 if softness shows |
+| M2 Bloom, side | Three-quarter view looking down into the cone, the dome rising above the paper line, the near rim soft across the bottom fifth. Lens level with the rim does not work with a paper filter: the bed sits deep in the cone and stays hidden | Tripod, lens about 10cm above the rim, about 35 degrees down, about 40cm away, f/5.6, 1080p 50p, MF on the dome top; 25g coffee so the bed sits high, Switch valve open, 50g bloom water only. Window behind (hazy trees), warm lamp low from the left as fill | 6s | Hook alternative, Ep 4 slow pour | Anytime | Partial, AI: **`M2/M2_AI_bloom_k3_slow.mp4` is the pick** (5s; Kling 2.5 image-to-video from an AI start frame matched to the real gear and window, first 2.5s of take k3, RIFE 2x slow motion). Fully generated, and taller than a real light-roast bloom: use as b-roll, do not present it as our coffee's bloom. Real takes: MVI_0227 failed (low angle, flooded bed, no dome; 0:04-0:16 is a clean pour stream against a dark backdrop, usable as a pour insert). Guide: `M2_guide_bloom-34angle100.jpg` (the drawn angle is too low; follow the caption) |
+| M3 Drip into the cup | Through the V60 glass server: the Switch stem tip at the top, a drop forming and falling, the jet rebounding from the coffee at the bottom centre | Tripod, lens level with the gap, square to the glass, about 40cm away, f/5.6, 1080p 50p, MF on the stream (not the glass). Keep the glass clear: drip room-temperature coffee through the Switch (no steam, no mist), or pre-heat the server and wipe the inside with a soap film. Window behind | 4s (10s+ roll, late drawdown) | Ep 1, 4 | Anytime | Partial: **MVI_0222 0:55-1:20 is the pick** (drops throw amber rebound jets about 3 times a second; lovely at half speed, but focus is on the glass, mist spots inside, stem out of frame, 720p). MVI_0220 (wide silhouette of the Switch on the server against the hazy window) works as an establishing shot, not M3. Guide: `M3_guide_stem-to-jet100.jpg` |
 | M4 Steam | Steam rising off the cup, backlit by the window | Tripod, f/4, 50p | 4s | Ep 1, 5 | Day | - |
 | M5 Cat eyes opening | Face tight, eyes and nose; half-closed to open | Eye level, 1-1.5m away, f/4, 50p, tripod; film a nap session of 5+ minutes | 5-8s of the moment | Hook, every episode | Anytime | Partial: **M5_t06 is the pick** (50p): a real wake-up, but the eyes open as the head lifts and the last frames go soft. Backup: M5_t04 (25p), a slow blink. Reshoot for a clean eyelid-only opening if you want one |
 | M6a Ear flick, eyes closed | Ears and whiskers, eyes shut or a slit; the ear twitches or swivels toward a sound while the cat dozes | Eye level, f/4, 50p, tripod; a quiet pour or bag rustle off-camera while the cat sleeps. Leave room above the ear | 5s (the twitch plus a beat before and after) | Ep 1 ritual beat (cat dozes through the pour), Ep 3 | Anytime | - |
@@ -336,11 +336,26 @@ Exposure (6D Mark II; most macro frames are 50p, so 1/100; the small apertures a
 
 | Frame | Shutter | Aperture | ISO | Note |
 |-------|---------|----------|-----|------|
-| M1 / M2 bloom (50p) | 1/100 | f/5.6 | 800-3200 | f/5.6 keeps the whole dome sharp |
-| M3 drip / M11 stretch (50p) | 1/100 | f/4 | 800-3200 | |
+| M1 bloom, overhead (50p) | 1/100 | f/8 | 1600-3200 | f/8 at about 70cm keeps the whole bed and the rim sharp |
+| M2 bloom, three-quarter (50p) | 1/100 | f/5.6 | 800-3200 | f/5.6 keeps the whole dome sharp |
+| M3 drip (50p) | 1/100 | f/5.6 | 800-3200 | Focus on the stream, not the glass |
+| M11 stretch (50p) | 1/100 | f/4 | 800-3200 | |
 | M4 steam (50p) | 1/100 | f/4 | 400-1600 | Dark background behind the steam, light from behind it |
 | M5 eyes / M6a / M6b ears (50p) | 1/100 | f/4 | 800-3200 | Focus on the near eye; never wider than f/4 on the cat |
 | M7 belly / M8 / M9 / M10 (25p) | 1/50 | f/4 | 400-1600 | |
+
+Set the 6D Mark II movie size to **1080p 50p** (FHD 50.00P), not 720p: every macro take on 23 Oct came out 720p.
+
+**Getting a visible bloom from light roast** (it holds less CO2 and releases it slowly), most effective first:
+1. Grind right before the take; ground coffee loses most of its gas within 15-30 minutes. Set up camera, light and focus with an old dose, then grind and pour within a minute.
+2. Beans 5-14 days off roast (light roast often peaks around day 7-10).
+3. Grind one or two steps finer than for drinking; this take is not for the cup.
+4. Water at 96-100°C; pre-wet the paper and warm the Switch.
+5. Switch valve **open** for the bloom; closed, the water pools and the bed floats instead of doming.
+6. 20-25g of coffee, so the bed is deeper and sits higher in the cone.
+7. Level the bed with a small dent in the centre; pour about 2x the coffee weight slowly from the centre outward, spout 2-3cm above the bed, then get the kettle out of frame.
+8. A lamp low from the window side, raking across the bed, brings out texture and bubble highlights.
+9. In the edit, play a light-roast rise at 1.5-2x; keep slow motion for bubbles popping.
 
 #### Canon 70-200mm f/4: the view the cat sees
 
