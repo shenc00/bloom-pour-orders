@@ -94,7 +94,7 @@ All at home, normal lenses only. The cat only sniffs: the cup is set down, sniff
 | 17-22s | Coffee 3 | Title card, sniff (S4 setup), the lick insert. Have: `_trimmed/X_lick-front_t02_m8frame.mp4` | Note on the aroma: "Smells like caramel." Never "tastes" |
 | 22-29s | The mystery cup (gag) | A plain "3-in-1 instant" packet (no real brand) and a mug, sniff (S4 setup), Critic 1 turn-away. Have: `_trimmed/X_critic-turn-away_t01.mp4` (squint, turns away, looks back at the lens) | Note: "Absolutely not." The gag lands on instant coffee, not on a coffee we sell |
 | 29-35s | Payoff | Coffee line-up with paw ratings (S6, to shoot), text "Pick your coffee. Pre-order, free delivery within Ki Residences (4+ cups)", then the VIP turns to the viewer and meows (M12). Have: `_enhanced/M12_t01_meow.mp4` | Call to action. Caption on the meow: "The VIP has ordered. Your turn." Keep the real meow loud and dip the music under it. The order is for the room, never "the cat's coffee" |
-| 35-39s | Cliffhanger | The cat turns its head toward the door (`_trimmed/X_window-headturn_t01.mp4`, fisheye, or a new S1 head turn), then the empty corridor from the doorstep with a lift chime (`F9/MVI_0127`) | Caption: "Room service is on the way..." Cut to black |
+| 35-39s | Cliffhanger | The cat turns its head toward the door (`_trimmed/X_window-headturn_t01.mp4`, fisheye, or a new S1 head turn), then the empty corridor from the doorstep (`F9/MVI_0127`) with the lift chime laid over it (`Audio/clean/lift_chime.wav`; the clip itself has no chime) | Caption: "Room service is on the way..." Cut to black |
 
 To shoot: window-seat sniffs in the S4 setup (one take per cup, or one take reused with the cup swapped), S6 line-up. M9 is on the floor outside the VIP Suite flap, so it lives in Ep 3, not here.
 
@@ -102,18 +102,18 @@ To shoot: window-seat sniffs in the S4 setup (one take per cup, or one take reus
 
 The cup travels through the estate, up the lift and along our floor to the front door, then inside to the cat's room: the **VIP Suite**. No cat outdoors. **Linking rule for the whole series:** the cat's room door is the VIP Suite (a yellow "VIP SUITE" sign on the handle, S13), and the cat always enters a scene through its cat flap (F1, S14). Room service always ends at that door with two shakes of the kibbles. The front door to suite door cut is a door-to-door match, so the building and the home read as one route. Keep unit numbers out of frame.
 
-**The courier.** The delivery is carried by a small Lego delivery car, not a person, so no hand, face or unit number is ever in shot. Build it in the series yellow (the CHOPE! and VIP SUITE signs) with a tiny "ROOM SERVICE" label and a Lego-scale cup in its bed (a real cup is too big and would spill). It drives itself: a Lego Powered Up motor for a steady slow crawl, or, free, a thread pulled from off-frame (fishing line vanishes at 1080p; or pull it toward the lens and reverse the clip so it drives away). Lens at the car's height (3-5cm for the fisheye, 30-40cm for the corridor), locked off. A tiny car in a long real corridor is deliberate: it reads small and brave. At the suite door it bumps twice, and the edit lays two shakes of kibbles on the bumps (the sound the cat knows; recording to come, not yet shot). Shoot the courier with the cat out of the room (small parts are a choking risk); the cat's reaction comes from the existing clips.
+**The courier.** The delivery is carried by a small Lego delivery car, not a person, so no hand, face or unit number is ever in shot. Build it in the series yellow (the CHOPE! and VIP SUITE signs) with a tiny "ROOM SERVICE" label and a Lego-scale cup in its bed (a real cup is too big and would spill). It drives itself: a Lego Powered Up motor for a steady slow crawl, or, free, a thread pulled from off-frame (fishing line vanishes at 1080p; or pull it toward the lens and reverse the clip so it drives away). Lens at the car's height (3-5cm for the fisheye, 30-40cm for the corridor), locked off. A tiny car in a long real corridor is deliberate: it reads small and brave. At the suite door it bumps twice, and the edit lays two shakes of kibbles on the bumps (the sound the cat knows; have: `Audio/shake1.mp4`, `Audio/shake2.mp4`, see [bloom-resort-audio.md](bloom-resort-audio.md)). Shoot the courier with the cat out of the room (small parts are a choking risk); the cat's reaction comes from the existing clips.
 
 | Time | Beat | Shot (have / to shoot) | Notes |
 |------|------|------------------------|-------|
 | 0-3s | Hook | M1 porthole to M5 eyes. Have | |
 | 3-7s | Answer to Ep 2: the order is in | Cup set down and lidded (S5, to shoot), the cat at the window watching. Have: `_trimmed/X_window-gaze-up_t01.mp4` | Caption: "Order received. Room service for the VIP." |
 | 7-10s | Through the estate | `_enhanced/Z7_t01_entrance.mp4` (the lit lobby gate), `_trimmed/X_lobby-walk_t01.mp4` | Night; the cup heads home |
-| 10-14s | The lift | `_enhanced/Z7_t02_lift.mp4` (the doors open on an empty lift) | A lift chime on the cut |
+| 10-14s | The lift | `_enhanced/Z7_t02_lift.mp4` (the doors open on an empty lift) | Lift chime on the cut (`Audio/clean/lift_chime.wav`), then the door motor about 1.2s later (`lift_door.wav`), both extracted from the corridor footage |
 | 14-18s | Our floor | `_enhanced/Z6_t01.mp4` (the corridor centred); the Lego courier drives away down the corridor in this framing (Z6 courier, to shoot) | Lens low so the car reads |
 | 18-21s | The VIP senses it | Ears swivel (`_enhanced/M6b_t01.mp4`), head turns (`_trimmed/X_window-headturn_t01.mp4`) | Intercut, rectangular then fisheye |
 | 21-25s | Home | F9 peephole: the courier rolls up the corridor and stops at the doorstep, its cup filling the circle (F9 courier take, to shoot; plate: `F9/MVI_0127`) | Circle beat |
-| 25-28s | The VIP Suite | The courier parks by the cat flap of the "VIP SUITE" door and bumps the door twice (S14, to shoot; S13 for the door wide) | Match cut from the front door to the suite door. The two kibble shakes are the series' room-service sound (audio to record) |
+| 25-28s | The VIP Suite | The courier parks by the cat flap of the "VIP SUITE" door and bumps the door twice (S14, to shoot; S13 for the door wide) | Match cut from the front door to the suite door. The two kibble shakes are the series' room-service sound (have: shake1 on bump 1, shake2 on bump 2), then a begging meow from behind the door |
 | 28-33s | The VIP emerges | The cat comes out through the flap to the delivered cup and sniffs it (M9: `M9/M9_flow_1-2.mp4`), face square in the circle (`_enhanced/F1_t02_inspect.mp4`) | Caption: "Inspection: passed." The courier carries a Lego-scale cup but the cup at the door is full size: keep the car's cup small or soft in its last shot and cut on the second bump to the real cup already waiting by the flap |
 | 33-37s | Payoff | Text: "Stay in. We bring the cup. Free delivery within Ki Residences (4+ cups)" over the nose-up air sniff beside the cup (M9: `M9/MVI_0367.MOV` 4.4-7.9s) | Call to action |
 | 37-41s | Cliffhanger | The light dims on the cat beside the cup (M9: `M9/MVI_0368.MOV`, 2.6s), or eyes get heavy (`_trimmed/X_loaf-drowsy_t01.mp4`, `_enhanced/X_face-doze_t01.mp4`); the circle closes on the sleeping face (`_enhanced/F3_t06.mp4`) | Caption: "Where do VIPs go when they dream?" Cut to black |
@@ -129,7 +129,7 @@ The one episode where fisheye shots run back to back: inside the dream the porth
 | 0-3s | Hook | M1 porthole to M5 eyes. Have | |
 | 3-9s | Answer to Ep 3: falling asleep | Belly breathing (`_enhanced/M7_t03_flank.mp4`), sleeping face (`_enhanced/X_sleep-face-macro_t01.mp4`), into the F3 circle (`_enhanced/F3_t06.mp4`) | Caption: "The VIP is resting." |
 | 9-11s | Into the dream | The circle opens into the glide | Big-moment transition |
-| 11-27s | The dream glide | In the porthole, dissolving: path-lights glide (`_enhanced/F5_t04.mp4`), the lit steps (`_trimmed/X_lit-steps_t01.mp4`), the canopy rising (`_enhanced/F4_t03.mp4`), the pool at night (`_trimmed/F6_t10_night.mp4`), under a slow-motion pour (`M2/M2_AI_bloom_k3_slow.mp4`, AI, dream only) | Soft, slow, grey-gold; one shared ambience bed |
+| 11-27s | The dream glide | In the porthole, dissolving: path-lights glide (`_enhanced/F5_t04.mp4`), the lit steps (`_trimmed/X_lit-steps_t01.mp4`), the canopy rising (`_enhanced/F4_t03.mp4`), the pool at night (`_trimmed/F6_t10_night.mp4`), under a slow-motion pour (`M2/M2_AI_bloom_k3_slow.mp4`, AI, dream only) | Soft, slow, grey-gold; dream piano only, no effects |
 | 27-31s | Waking | The iris closes to the rectangle: the cat wakes (`_trimmed/F3_t03.mp4`, wakes at 4.6s, or `_enhanced/M5_t08_wake.mp4`, eyes open toward the lens) beside a real cup (S4 cup on the window-seat platform, to shoot) | |
 | 31-35s | Payoff | Text: "Dream resort. Real coffee. Follow for the next drop." over the cup sliding in beside the cat (S4) | Brand / follow |
 | 35-39s | Cliffhanger | The cat turns to the window (`_trimmed/X_window-headturn_t01.mp4`), the view: grey layers (`_enhanced/T9_t01.mp4`), the dull orange sun (`_enhanced/T10_t01_thirds.mp4`) | Caption: "Wait. Where did the sky go?" Cut to black |
@@ -197,7 +197,7 @@ Episode 2 (The Review) stays with the normal lenses.
 
 **Ep 4 exception:** inside the dream the circle stays in place and its contents dissolve from shot to shot; this is the one place fisheye shots run back to back.
 
-**Keeping the two looks one series:** same grade (warm room, grey haze outside), same ambient sound bed, circle accents of 2-4s with at least 5s of rectangular shots between them (Ep 4 excepted). Do not de-fish the circle into a rectangle.
+**Keeping the two looks one series:** same grade (warm room, grey haze outside), same sound rules (solo piano, no voices, effects only when needed; see [bloom-resort-audio.md](bloom-resort-audio.md)), circle accents of 2-4s with at least 5s of rectangular shots between them (Ep 4 excepted). Do not de-fish the circle into a rectangle.
 
 **Extra shots this needs:** an M1 variant with the cup from directly above, framed so the rim matches the porthole (the key match cut; covered for now by `M1_outpaint_porthole_0218.mp4`, see M1); an M5 variant with the eye centred in frame; optionally a centred rectangular shot of a path-light glow or the pavilion dome.
 
@@ -215,7 +215,7 @@ Episode 2 (The Review) stays with the normal lenses.
 3. Same cushion or surface in every shot.
 4. Consistent screen direction for the cat's gaze.
 5. Same collar, or none.
-6. One shared pool and garden ambience bed under the whole video.
+6. Solo piano under the whole video, no ambience bed (see [bloom-resort-audio.md](bloom-resort-audio.md)).
 7. Cut between mismatched poses with a cutaway (the pour, the cup).
 8. A light colour grade to unify home and estate shots.
 
@@ -254,7 +254,7 @@ Severe haze turns the estate grey and the sun into a dull orange disc. It has la
 - Haze flattens contrast and removes the blue. Do not try to make the estate shots look clear; grade for mood, not clarity.
 - Haze shows layers: treeline behind treeline fading to grey. That is what T9 is for.
 - Shoot from inside, through a clean closed window, where possible. Put the lens hood against the glass or hang a dark cloth to cut reflections. On the 70-200 the B+W CPL helps too, but use it only to clear glass reflections: rotate to the lightest effect that does the job. A polarizer can also thin the atmospheric haze and darken the sky, which works against the look (see "Filters").
-- Sound: windows closed means a quiet room. Keep a low ambient bed, not the pool sounds used in other episodes.
+- Sound: windows closed means a quiet room. Piano only, no pool sounds (see [bloom-resort-audio.md](bloom-resort-audio.md)).
 - Cat stays indoors with the windows closed. Keep any outdoor time for the estate shots short.
 - Do not make health claims in the caption (no mention of air quality, protection or safety). Keep it about staying in and the coffee.
 
@@ -573,7 +573,7 @@ Each lens section above has a per-frame exposure table. The general rules:
 - White balance: manual Kelvin, fixed across a shoot (about 5600K daylight, 7000K or higher blue hour).
 - Picture style: Neutral or Faithful, sharpness 0, contrast -2.
 - Focus: manual on every lens. Movie Servo AF off (it hunts mid-take). Focus with live view magnify (5x/10x) on the cat's spot or the subject before rolling; for the fisheye, AF once, then switch the lens to MF.
-- Audio: manual levels. Record 30s of separate ambient sound at the pool.
+- Audio: manual levels, no talking during takes. Camera sound is muted in the edit except the picked effects (cup set down, lid snap, courier, sign); no ambience recording needed (see [bloom-resort-audio.md](bloom-resort-audio.md)).
 
 ### Vertical (9:16) output
 
@@ -668,7 +668,7 @@ The whole series is real footage: the owner shoots, Claude reviews, trims and ed
 - Raw camera names (`MVI_xxxx`) are fine. Put them in a folder named for the frame (`F7/`), or the session for loose shots (`Dusk_fisheye/`); Claude names the trimmed picks.
 - If you do rename: `<frame ID>_t<take number>.<ext>`, e.g. `M5_t03.mov`. Shots not in the plan: `X_<short description>_t01`, e.g. `X_rain-window_t01.mov`.
 - Optional `notes.txt` per folder: one line per clip for anything useful ("M5_t03: best, eyes open at 0:04", "S1_t02: cat looks wrong direction").
-- Record pool and garden ambience (30s or more) into `audio/`.
+- Sound recordings still to make (sachet rustle, courier wheels and bumps, cup and lid sounds) go into `Audio/`. The lift chime, lift door and cat flap are already extracted from existing footage into `Audio/clean/`; the list is in [bloom-resort-audio.md](bloom-resort-audio.md).
 - Do not delete takes yourself; after review, only unusable ones go to the Recycle Bin.
 
 ## Open questions
