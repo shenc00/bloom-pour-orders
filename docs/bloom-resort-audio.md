@@ -87,21 +87,21 @@ Status: **Have** = file exists. **Record** = record it yourself (phone is fine, 
 
 | Ep | Time | Sound | Why it's needed | Source | Status |
 |----|------|-------|-----------------|--------|--------|
-| all | 0-3 | Soft pour under the macro bloom, about 8 dB under the other effects | The hook's only real sound, the same in every episode | `clean/pour_water.wav` (stand-in, see below) | Have (stand-in) |
-| 1, 5 | ritual | Water pouring from the kettle | The cat's ear flick reacts to it (Ep 1) | S2/S3 own sound when shot; until then `clean/pour_water.wav` (First Cut 72.5-76.9s) | Have (stand-in) |
+| all | 0-3 | Soft pour under the macro bloom, about 8 dB under the other effects | The hook's only real sound, the same in every episode | `clean/pour_short.wav` (your recording) at low level | Have |
+| 1, 5 | ritual | Water pouring from the kettle | The cat's ear flick reacts to it (Ep 1) | `clean/pour_short.wav` (4.4s) for the ritual beat, `clean/pour_long.wav` (13s, the pitch rises as the vessel fills) when the pour needs to run long. S2/S3's own sound can replace them | Have |
 | 1, 2, 4 | S4 | Cup set down on the platform, short slide | The picture shows it | S4 own sound (record while shooting, felt pad muted) | Record |
-| 2 | 22-29 | Instant-coffee packet rustle | Sells the gag before the sniff | Record (any sachet) or AI | Record or AI |
+| 2 | 22-29 | Instant-coffee packet rustle | Sells the gag before the sniff | `clean/sachet_rustle.wav` (2s, one continuous rustle), or `sachet_rustle_long.wav` (2.9s, three phases) to run under the sniff | Have |
 | 2 | turn-away | Discontent meow | "Absolutely not" | `Audio/meow_discontent.mp4` 1.57-2.25s | Have |
 | 2 | 29-35 | The VIP's order meow | In sync on camera | `_enhanced/M12_t01_meow.mp4` own sound | Have |
 | 2 | 35-39 | Lift chime, heard from the doorstep | Sets up Ep 3 ("Room service is on the way...") | `clean/lift_chime.wav`, your lift's real chime, extracted from the corridor footage (`Z6_7/MVI_0275` 2.5-3.8s). `F9/MVI_0127` has no chime | Have |
 | 2 | 35-39 | One muffled kibble shake (optional) | Gives the head turn toward the door a reason | `Audio/shake2.mp4` first hit, low-passed (Claude) | Have |
-| 3, 5, 6 | S5 | Cup lid snapped on | The picture shows it (Ep 6: one snap per counter drop) | S5 own sound | Record |
+| 3, 5, 6 | S5 | Cup lid snapped on | The picture shows it (Ep 6: one snap per counter drop) | `clean/cup_lid.wav` (1.4s: lid placed, pressed, snapped), `clean/cup_lid_snap.wav` (0.45s, the snap alone: use it for Ep 6's counter drops), `clean/cup_lid_alt.wav` (second take, several presses and a sharper snap). S5's own sound can replace them | Have |
 | 3 | 10-14 | Lift chime plus doors opening | On the cut to the open lift | `clean/lift_chime.wav`, then `clean/lift_door.wav` about 1.2s later (the real gap in the take; the doors start moving then) | Have |
 | 3, 5 | courier | Small plastic wheels rolling on tile, motor whir | The tiny car needs a sound to feel alive | Courier shoot own sound (Powered Up motor). If thread-pulled: AI | Record or AI |
 | 3, 5 | 25-28 | Two small plastic bumps on the door | The two bumps | Courier shoot own sound, or AI | Record or AI |
 | 3, 5 | 25-28 | Two kibble shakes, one on each bump | The series' room-service sound | `Audio/shake1.mp4` 0.80-1.50s (bump 1), `Audio/shake2.mp4` 0.97-1.85s (bump 2) | Have |
 | 3 | 25-28 | Begging meow from behind the door | The cat answers the shakes and motivates the exit | `Audio/meow_begforfood.mp4` 3.22-4.51s, muffled through the door (Claude) | Have |
-| 3 | 28-33 | Cat flap swinging and clacking | The cat comes out through it | `clean/cat_flap.wav` (`M9/MVI_0363` 78.1-78.85s: three clacks as the cat pushes through, just before the M9 cut starts). Low confidence, check by ear; if it's weak, record the flap by hand | Have (check) |
+| 3 | 28-33 | Cat flap swinging and clacking | The cat comes out through it | `clean/cat_flap.wav` (your recording: one push through, two swings, 1.65s). `clean/cat_flap_soft.wav` is a single lighter swing for the return | Have |
 | 4 | 31-35 | Soft content meow | "Dream resort. Real coffee." (keep the mouth out of frame in S4) | `Audio/meow_soft.mp4` 2.37-3.06s | Have |
 | 6 | 20-26 | Paper sign set on the sill | The picture shows it | S9 own sound | Record |
 | 6 | over black | Demanding meow | "The VIP wants a refill" | `Audio/meow_demanding.mp4` 8.48-9.80s | Have |
@@ -124,29 +124,36 @@ All files are in `Videos/BloomPour/BloomResort_S1/Audio/clean/`, 48 kHz 24-bit W
 | `meow_m12` | `_enhanced/M12_t01_meow.mp4` own sound | 3.50-5.10s (the on-camera meow; mute the clip's other sound) |
 | `lift_chime` | `Z6_7/MVI_0275.MOV` | 2.50-3.80s (two clean tones at about 2.6 and 5.3 kHz, about 0.8s) |
 | `lift_door` | `Z6_7/MVI_0275.MOV` | 3.85-5.40s (click, then the door motor and rollers) |
-| `cat_flap` | `M9/MVI_0363.MOV` | 78.10-78.85s |
-| `pour_water` | `20261010/First Cut.mp4` | 72.5-76.9s (stand-in until S2/S3) |
+| `cat_flap` | `Audio/catflap.mp4` | 1.15-2.80s (you recorded 4 pushes; this is one clean push through, two swings) |
+| `cat_flap_soft` | `Audio/catflap2.mp4` | 5.45-6.65s (the one full swing in that take; the rest are light taps) |
+| `pour_long` | `Audio/pourwater2.mp4` | 2.20-15.70s (the whole pour) |
+| `pour_short` | `Audio/pourwater1.mp4` | 2.30-6.80s |
+| `cup_lid` | `Audio/cuplid2.mp4` | 0.65-2.10s |
+| `cup_lid_snap` | `Audio/cuplid2.mp4` | 1.60-2.05s |
+| `cup_lid_alt` | `Audio/cuplid1.mp4` | 1.10-2.95s |
+| `sachet_rustle` | `Audio/plasticrustle3.mp4` | 0.30-2.50s |
+| `sachet_rustle_long` | `Audio/plasticrustle1.mp4` | 0.30-3.40s |
+
+Not used: `plasticrustle2.mp4` (8.6s of fiddling, the same sound as the other two), the quiet taps in `catflap2.mp4`, and the first 2s of both pour takes (handling thumps before the water).
 
 What was done to each, the same way:
 1. High-pass (60-400 Hz depending on the sound) to drop room rumble.
 2. Noise removal that learns each source's own steady hiss and hum from its quietest frames, then subtracts it. Strength is set per sound (gentle on the clean meows, firmer on the corridor takes).
 3. Trimmed to the sound itself with a short fade in and a soft fade out.
 4. **Same clarity inside a group:** the meows (5) and the shakes (2) are pulled toward their group's average tone, at most 5 dB either way, so no meow sounds duller or brighter than the others because of the mic.
-5. **Same volume for everything:** all files are levelled to -22 LUFS and kept under -1.5 dBTP. `cat_flap` is the exception (-24 LUFS): its clacks are so sharp that more gain would clip.
+5. **Same volume for everything:** all files are levelled to -22 LUFS (within 0.5) and kept under -1.5 dBTP. Sharp sounds (flap, rustle, pour splashes) go through a transparent limiter to get there.
 
-Not yet checked by ear. The numbers and the spectrograms look right, but play each file once, especially `cat_flap` and `lift_door`, and say if any sounds off.
+Not yet checked by ear. The numbers and the spectrograms look right, but play each file once, especially `lift_door`, and say if any sounds off.
 
 ## What's missing
 
 **You still need to record these.** They have to sound like the real place, and you can capture them on the shoot days anyway:
 
-1. **S4, S5 and S9:** keep the camera sound on during these shoots (manual levels, no talking). That covers the cup set-down and slide, the lid snap and the paper sign.
+1. **S4 and S9:** keep the camera sound on during these shoots (manual levels, no talking). That covers the cup set-down and slide, and the paper sign.
 2. **The courier:** keep the camera sound on during the courier takes. That covers the wheels, the motor and the bumps.
-3. **An instant-coffee sachet rustle:** 5s. Or use AI.
-4. **Optional:** a second cat flap take, by hand, if `cat_flap` turns out weak.
 
 **AI can make these if you'd rather not record:**
-- Packet rustle, toy-car wheels, plastic bumps and the cup lid snap.
+- Toy-car wheels, plastic bumps, the cup set-down and the paper sign.
 - About $0.05 each.
 
 **Can't be faked well, but you already have them:**

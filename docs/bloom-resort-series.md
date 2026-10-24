@@ -668,7 +668,7 @@ The whole series is real footage: the owner shoots, Claude reviews, trims and ed
 - Raw camera names (`MVI_xxxx`) are fine. Put them in a folder named for the frame (`F7/`), or the session for loose shots (`Dusk_fisheye/`); Claude names the trimmed picks.
 - If you do rename: `<frame ID>_t<take number>.<ext>`, e.g. `M5_t03.mov`. Shots not in the plan: `X_<short description>_t01`, e.g. `X_rain-window_t01.mov`.
 - Optional `notes.txt` per folder: one line per clip for anything useful ("M5_t03: best, eyes open at 0:04", "S1_t02: cat looks wrong direction").
-- Sound recordings still to make (sachet rustle, courier wheels and bumps, cup and lid sounds) go into `Audio/`. The lift chime, lift door and cat flap are already extracted from existing footage into `Audio/clean/`; the list is in [bloom-resort-audio.md](bloom-resort-audio.md).
+- Sound recordings still to make (courier wheels and bumps, cup set-down, paper sign) go into `Audio/`. Done so far: shakes, meows, cat flap, pour, sachet rustle and cup lid recorded; lift chime and door extracted from the corridor footage; all cleaned into `Audio/clean/`. The list is in [bloom-resort-audio.md](bloom-resort-audio.md).
 - Do not delete takes yourself; after review, only unusable ones go to the Recycle Bin.
 
 ## Open questions
