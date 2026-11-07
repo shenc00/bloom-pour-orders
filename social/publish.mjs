@@ -4,7 +4,7 @@
 //   node social/publish.mjs insights <media-id>
 //   node social/publish.mjs refresh                       (extends the token ~60 days; run after day 1)
 //   node social/publish.mjs selftest
-// Queue folder: meta.json {"status":"approved","images":["01.jpg",...]}, caption.md, and the images
+// Queue folder: meta.json {"status":"approved","images":["01.jpg",...]} or {"video":"reel.mp4","cover":"cover.jpg"}, caption.md, and the media
 // already deployed at SITE_URL/social/<slug>/<image> (Instagram fetches them from that public URL).
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { basename, join } from 'node:path';
@@ -36,6 +36,7 @@ async function call(method, path, params) {
 function checkQueue(meta, caption) {
   if (meta.status !== 'approved') throw new Error(`status is "${meta.status}", not "approved"`);
   if (meta.video) { if (meta.images) throw new Error('video and images are mutually exclusive'); }
+  else if (meta.cover) throw new Error('cover is for a video (Reel) only');
   else if (!meta.images?.length || meta.images.length > 10) throw new Error('need 1-10 images');
   if (!caption.trim()) throw new Error('caption.md is empty');
   if (caption.length > 2200) throw new Error('caption over 2200 characters');
@@ -57,7 +58,7 @@ async function post(dir) {
   const caption = readFileSync(join(dir, 'caption.md'), 'utf8');
   checkQueue(meta, caption);
   const { IG_ACCESS_TOKEN: token, IG_USER_ID: user, SITE_URL: site } = env;
-  const files = meta.video ? [meta.video] : meta.images;
+  const files = meta.video ? [meta.video, ...(meta.cover ? [meta.cover] : [])] : meta.images;
   const urls = files.map(f => `${site.replace(/\/$/, '')}/social/${basename(dir)}/${f}`);
   for (const u of urls) {
     const r = await fetch(u, { method: 'HEAD' });
@@ -66,7 +67,8 @@ async function post(dir) {
   let creation;
   if (meta.video) {
     // ponytail: Instagram Login tokens reject resumable upload, so video must be hosted at a public URL.
-    creation = (await call('POST', `${user}/media`, { media_type: 'REELS', video_url: urls[0], share_to_feed: 'true', caption, access_token: token })).id;
+    const cover = meta.cover ? { cover_url: urls[1] } : {};
+    creation = (await call('POST', `${user}/media`, { media_type: 'REELS', video_url: urls[0], ...cover, share_to_feed: 'true', caption, access_token: token })).id;
     await waitFinished(creation, token, 90);
   } else if (urls.length === 1) {
     creation = (await call('POST', `${user}/media`, { image_url: urls[0], caption, access_token: token })).id;
@@ -98,6 +100,8 @@ function selftest() {
   const ok = { status: 'approved', images: ['a.jpg'] };
   checkQueue(ok, 'hi');
   checkQueue({ status: 'approved', video: 'v.mp4' }, 'hi');
+  checkQueue({ status: 'approved', video: 'v.mp4', cover: 'c.jpg' }, 'hi');
+  assert.throws(() => checkQueue({ ...ok, cover: 'c.jpg' }, 'hi'), /video \(Reel\) only/);
   assert.throws(() => checkQueue({ ...ok, video: 'v.mp4' }, 'hi'), /mutually exclusive/);
   assert.throws(() => checkQueue({ ...ok, status: 'draft' }, 'hi'), /not "approved"/);
   assert.throws(() => checkQueue({ ...ok, images: [] }, 'hi'), /1-10/);
